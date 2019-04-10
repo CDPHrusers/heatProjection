@@ -24,7 +24,7 @@ filterED <- function(year) {
              "ccs_odx1",
              "ccs_odx2" ,
            # "fac_id",
-             "pat_type",
+           # "pat_type",
            # "lic_type",
            # "agdyserv",
            # "agyrserv",
