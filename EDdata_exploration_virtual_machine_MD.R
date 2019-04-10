@@ -4,19 +4,26 @@ getwd()
 library(data.table)
 library(tidyverse)
 library(parallel)
+#define bobb codes of interest - all related to heat illness
 bobbCodes <- c(55L, 157L, 159L, 244L, 108L, 2L)
 
-file <- "/processed/ED_6CCScodes.csv"
+##identify the data we want to pull in
+file <- "/data/processed/ED_6CCScodes.csv"
 
+##read in the ED data
 ED<-fread(paste(file))
 head(ED)
+#sort based on primary diagnosis
 sort(table(ED$ccs_dx_prin))
 sort(table(ED$ccs_odx1))
 sort(table(ED$ccs_odx2))
 
 class(ED)
 class(ED$ccs_dx_prin)
+
+##classify the principal diagnosis as a numeric
 ED$ccs_dx_prin<-as.numeric(ED$ccs_dx_prin)
+##set key to be principal diagnosis (based on ccs)
 setkey(ED, ccs_dx_prin)
 sub<-ED[.(bobbCodes)]
 
@@ -35,6 +42,8 @@ sub$payer<-as.factor(sub$payer)
 saveRDS(sub, "sub.ED.factors.rds")
 
 ##summary stats
+
+##Bobb codes of interest related to heat illness
 ##55=Fluid and electrolyte disorders 
 ##157=Acute and unspecified renal failure 
 ##159=Urinary tract infections 
