@@ -1,6 +1,6 @@
 rm(list = ls())
-setwd('/mnt/projects/ohe/heatProjections/')
-setwd('/heatProjections/')
+# setwd('/mnt/projects/ohe/heatProjections/')
+# setwd('/heatProjections/')
 setwd('M:/')
 getwd()
 library(data.table)
@@ -19,25 +19,14 @@ if(packageVersion("dlnm")<"2.2.0")
 allZips <- fread("data/processed/tempAndED_allYears.csv")
 setkey(allZips, ZCTA)
 
+# restrict data to only zipcodes with cases -> I am second guessing this
 zipsWithCases <- allZips[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
 ##Only 320 out of ~2000 zip codes in CA have cases?
 
-##bring in all file
-file <-"data/dlnm_test_zips.rds"
-#zipCA <-readRDS(file)
-zipCA <- allZips[.(zipsWithCases)]
-
-
+##define data for model to run on
+zipCA <- allZips[.(zipsWithCases)] 
 
 zipCA$Date <- as.Date(zipCA$Date)
-
-##this needs to change. 
-zipCA$zipnames <- ifelse (zipCA$ZCTA == 93301, "Bakersfield",
-                         ifelse( zipCA$ZCTA == 93545, "LonePine", "Tahoe"))
-  
-
-#regEngWales <- read.csv("regEngWales.csv",row.names=1)
-#regEngWales$date <- as.Date(regEngWales$date)
 
 
 # ARRANGE THE DATA AS A LIST OF DATA SETS
@@ -55,19 +44,27 @@ cities <- data.frame(
 ord <- order(cities$cityname)
 dlist <- dlist[ord]
 cities <- cities[ord,]
+# these are indeces for the zipcodes that do not converge, as determined by running the model previously
 non.converge<-c(10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310)
 dlist.non<-dlist[non.converge]
 dlist.non.names<-names(dlist.non)
 
+# count the number of cases in each zipcode and create new datatable
 sum.n<-zipCA %>% group_by(ZCTA) %>% summarise(sum_n= sum(n))
+# create column that defines if the zipcode converged or not
 sum.n$converge<- ifelse(sum.n$ZCTA %in% dlist.non.names, "n","y")
+                
+# remove the zipcodes that did not converge
 dlist<-dlist[-c(10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310)]
+                
+# remove the zipcodes that did not converge
 cities<-cities[-c(10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310),]
+                
 # REMOVE ORIGINALS
 rm(zipCA,regions,ord)
 
 ################################################################################
-
+# The following specifications are those defined by Antonnio Gasparrini in his 2015 Lancet paper
 # SPECIFICATION OF THE EXPOSURE FUNCTION
 varfun = "bs"
 vardegree = 2
@@ -113,12 +110,12 @@ for(i in seq(length(dlist))) {
                  degree=vardegree)
   cb <- dlnm::crossbasis(data$tmean_mean,lag=lag,argvar=argvar,
                    arglag=list(knots=logknots(lag,lagnk)))
-  #summary(cb)
   
   # RUN THE MODEL AND OBTAIN PREDICTIONS
   # NB: NO CENTERING NEEDED HERE, AS THIS DOES NOT AFFECT COEF-VCOV
   model <- glm(formula,data,family=quasipoisson,na.action="na.exclude")
   options(warn=1)
+  
   #centered on average temperature
   cen <- mean(data$tmean_mean,na.rm=T)
   pred <- crosspred(cb,model,cen=cen, by=1)
@@ -131,9 +128,8 @@ for(i in seq(length(dlist))) {
   
 }
 proc.time()[3]-time
-##in dlist, 10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 
-##145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310 did not converge
-#
+# I ran the model originally and these were the zipcodes that did not converge -> these are the ones taken out at the beginning of script
+# in dlist: 10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310 did not converge
 coef[1]
 vcov[1]
 
@@ -312,7 +308,4 @@ write.csv(afcity,"attributable_frac_zips.csv")
 aftot <- antot/totdeathtot*100
 aftotlow <- antotlow/totdeathtot*100
 aftothigh <- antothigh/totdeathtot*100
-
-#
-
 
