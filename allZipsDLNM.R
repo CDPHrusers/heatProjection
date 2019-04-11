@@ -187,7 +187,7 @@ blup <- blup(mv,vcov=T)
 minperccity <- mintempcity <- rep(NA,length(dlist))
 names(mintempcity) <- names(minperccity) <- cities$city
 
-# DEFINE MINIMUM MORTALITY VALUES: EXCLUDE LOW AND VERY HOT TEMPERATURE
+# DEFINE MINIMUM ED VISIT VALUES: EXCLUDE LOW AND VERY HOT TEMPERATURE
 for(i in seq(length(dlist))) {
   data <- dlist[[i]]
   ##generate percentiles for average temperatures
@@ -205,7 +205,7 @@ for(i in seq(length(dlist))) {
   mintempcity[i] <- quantile(data$tmean_mean,minperccity[i]/100,na.rm=T)
 }
 
-# COUNTRY-SPECIFIC POINTS OF MINIMUM MORTALITY-> the median optimal percentile
+# COUNTRY-SPECIFIC POINTS OF MINIMUM ED VISIT-> the median optimal percentile
 (minperccountry <- median(minperccity))
 
 
@@ -215,18 +215,18 @@ for(i in seq(length(dlist))) {
 # LOAD THE FUNCTION FOR COMPUTING THE ATTRIBUTABLE RISK MEASURES
 source("code/attrdl.R")
 
-# CREATE THE VECTORS TO STORE THE TOTAL MORTALITY (ACCOUNTING FOR MISSING)
+# CREATE THE VECTORS TO STORE THE TOTAL ED VISITS (ACCOUNTING FOR MISSING)
 totdeath <- rep(NA,nrow(cities))
 names(totdeath) <- cities$city
 
-# CREATE THE MATRIX TO STORE THE ATTRIBUTABLE DEATHS
+# CREATE THE MATRIX TO STORE THE ATTRIBUTABLE ED VISITS
 matsim <- matrix(NA,nrow(cities),3,dimnames=list(cities$city,
                                                  c("glob","cold","heat")))
 
 # NUMBER OF SIMULATION RUNS FOR COMPUTING EMPIRICAL CI
 nsim <- 1000
 
-# CREATE THE ARRAY TO STORE THE CI OF ATTRIBUTABLE DEATHS
+# CREATE THE ARRAY TO STORE THE CI OF ATTRIBUTABLE ED VISITS
 arraysim <- array(NA,dim=c(nrow(cities),3,nsim),dimnames=list(cities$city,
                                                               c("glob","cold","heat")))
 
@@ -248,7 +248,7 @@ for(i in seq(dlist)){
   cb <- crossbasis(data$tmean_mean,lag=lag,argvar=argvar,
                    arglag=list(knots=logknots(lag,lagnk)))
   
-  # COMPUTE THE ATTRIBUTABLE DEATHS
+  # COMPUTE THE ATTRIBUTABLE ED VISITS
   # NB: THE REDUCED COEFFICIENTS ARE USED HERE
   matsim[i,"glob"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i])
@@ -259,7 +259,7 @@ for(i in seq(dlist)){
                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i],
                              range=c(mintempcity[i],100))
   
-  # COMPUTE EMPIRICAL OCCURRENCES OF THE ATTRIBUTABLE DEATHS
+  # COMPUTE EMPIRICAL OCCURRENCES OF THE ATTRIBUTABLE ED VISITS
   # USED TO DERIVE CONFIDENCE INTERVALS
   arraysim[i,"glob",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i],sim=T,nsim=nsim)
@@ -270,7 +270,7 @@ for(i in seq(dlist)){
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i],
                                 range=c(mintempcity[i],100),sim=T,nsim=nsim)
   
-  # STORE THE DENOMINATOR OF ATTRIBUTABLE DEATHS, I.E. TOTAL OBSERVED MORTALITY
+  # STORE THE DENOMINATOR OF ATTRIBUTABLE ED VISITS, I.E. TOTAL OBSERVED ED VISITS
   # CORRECT DENOMINATOR TO COMPUTE THE ATTRIBUTABLE FRACTION LATER, AS IN attrdl
   totdeath[i] <- sum(data$n,na.rm=T)
 }
@@ -291,7 +291,7 @@ antot <- colSums(matsim) ##839842.21 ED visits attributed to heat and cold
 antotlow <- apply(apply(arraysim,c(2,3),sum),1,quantile,0.025)
 antothigh <- apply(apply(arraysim,c(2,3),sum),1,quantile,0.975)
 ################################################################################
-# TOTAL MORTALITY
+# TOTAL ED VISITS
 
 # BY COUNTRY, the total number of ED visits (empirical)
 totdeathtot <- sum(totdeath)
