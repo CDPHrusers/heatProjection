@@ -7,7 +7,14 @@ library(tidyverse)
 library(parallel)
 
 ##Jason's functions
+
 ##define Bobb CCS codes of interest which will be filtered by later on
+##55=Fluid and electrolyte disorders 
+##157=Acute and unspecified renal failure 
+##159=Urinary tract infections 
+##244=Other injuries and conditions due to external causes
+##108=Congestive heart failure; nonhypertensive
+##2=Septicemia (except in labor)
 bobbCodes <- c(55L, 157L, 159L, 244L, 108L, 2L)
 
 ##create function to read in and filter the hospital data based on Bobb codes of interest
