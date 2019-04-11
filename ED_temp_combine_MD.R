@@ -7,13 +7,18 @@ library(tidyverse)
 library(parallel)
 
 ##Jason's functions
+##define Bobb CCS codes of interest which will be filtered by later on
 bobbCodes <- c(55L, 157L, 159L, 244L, 108L, 2L)
 
+##create function to read in and filter the hospital data based on Bobb codes of interest
 filterED <- function(year) {
   file<- paste0("ED/cdph_ed_rln",year,".csv")
   foo <- fread(paste(file))
   
+ ##set key to primary, secondary, and tertiary ccs diagnosis columns
   setkey(foo, ccs_dx_prin, ccs_odx1, ccs_odx2)
+ ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+ ##bring in patient's zipcode, county code, and date of service
   out <-
     foo [ccs_dx_prin %in% bobbCodes |
            ccs_odx1 %in% bobbCodes |
@@ -47,6 +52,7 @@ filterED <- function(year) {
            # "rln",
            # "race_grp"
            )] %>%
+  ##count the number of cases by patient zip code and by date
   .[,n :=.n, by=.(patzip, serv_dt)]%>%
   .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
@@ -54,6 +60,7 @@ filterED <- function(year) {
   
 }
 
+##create function to read in the PRISM temp data for each year of interest
 getPRISM <- function(year){
   #year<-2008
   file<- paste0("PRISM/prism_",year,".csv")
@@ -66,6 +73,7 @@ getPRISM <- function(year){
   
 }
 
+##create function that combines the hospital data and the temperature data into one datatable
 EDtempcombine <- function(year) {
    #ED <- filterED(2008) 
    #temp <- getPRISM(2008)
@@ -80,7 +88,7 @@ EDtempcombine <- function(year) {
   # summarize(n=n()) 
 # ED.agg$Date<-as.Date(ED.agg$serv_dt, format = "%m/%d/%Y")
 
-#merge the ED data with the temp data by zipcode and date
+#merge the ED data with the temp data by patient zipcode and date
 join<-merge(temp, ED, by.x = c("Date", "ZCTA"), by.y = c("Date", "patzip"), all.x = T) %>% replace_na(list(n = 0))
 
 fwrite(join, paste0("processed/tempAndED/tempAndED_",year,".csv"))
