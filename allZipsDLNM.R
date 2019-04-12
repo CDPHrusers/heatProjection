@@ -71,7 +71,8 @@ vardegree = 2
 varper <- c(10,75,90)
 
 # SPECIFICATION OF THE LAG FUNCTION
-lag <- 21
+# I changed the lag from the original 21 to 3 as suggested by Rish. I'm not sure if we now need to change the number of knots                
+lag <- 3
 lagnk <- 3
 
 # DEGREE OF FREEDOM FOR SEASONALITY-> knots per year
