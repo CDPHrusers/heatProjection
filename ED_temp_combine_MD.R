@@ -91,10 +91,7 @@ EDtempcombine <- function(year) {
 #temp <- getPRISM(2008)
 
   ED <- filterED(year) 
-temp <- getPRISM(year)
-ED.sub<-ED[,c('ccs_dx_prin','ccs_odx1','ccs_odx2','patzip','faczip','serv_dt')]
-summary(ED.sub$patzip)
-summary(ED.sub$faczip)
+  temp <- getPRISM(year)
 
 ##create aggregated data table for zip and day combos-using facility zip due to missingness in patient zip
 ED.agg<- ED.sub %>% 
