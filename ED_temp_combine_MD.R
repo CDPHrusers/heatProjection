@@ -50,22 +50,25 @@ filterED <- function(year) {
              "sex",
              "patzip",
              "patco",
-             "serv_q",
-             "serv_d",
-             "serv_m",
-             "serv_y",
+           # "serv_q",
+           # "serv_d",
+           # "serv_m",
+           # "serv_y",
              "dispn",
              "payer",
              "pr_prin",
              "opr1",
              "serv_dt",
-             "brthdate",
+           # "brthdate",
              "dob_raw",
              "faczip",
-             "fac_co",
+           # "fac_co",
              "rln",
              "race_grp"
-           )]
+           )] %>%
+  .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+
   
   return(out)
   
