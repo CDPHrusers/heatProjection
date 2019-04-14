@@ -1,8 +1,19 @@
-filterED <- function(bobbCodes, year, numDiagnosis) {
+#' Filter ED
+#'
+#' This function allows you to filter a single year of OSHPD Emergency Department Visits for the Clinical Classification System Codes of interest.
+#' @param BobbCodes This is a collection of text CCS codes to pull out. 
+#' @param year Four digit year as it appears in OSPHD filnes 'cdph_ed_rlnYYYY.csv'. Defauls to 2005
+#' @param numDiagnosis If 1, only the primary diagnosis will be used. Values of 2 or 3 correspond to including secondary and tertiatry diagnoses. Defaults to 3.
+#' @keywords EDvisits
+#' @export
+#' @examples
+#' filterED()
+
+filterED <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), year = 2005, numDiagnosis = 3) {
   file<- paste0("ED/cdph_ed_rln",year,".csv")
   foo <- fread(paste(file))
   
-  if (numDiagnosis=1){
+  if (numDiagnosis==1){
     setkey(foo, ccs_dx_prin)
     ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
     ##bring in patient's zipcode, county code, and date of service
@@ -41,7 +52,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
     
     return(out)
     
-  } else if (numDiagnosis=2) {
+  } else if (numDiagnosis==2) {
     ##set key to primary, secondary, and tertiary ccs diagnosis columns
     setkey(foo, ccs_dx_prin, ccs_odx1)
     ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
@@ -83,7 +94,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
     
     return(out)
     
-  } else if (numDiagnosis=3) {
+  } else if (numDiagnosis==3) {
     ##set key to primary, secondary, and tertiary ccs diagnosis columns
     setkey(foo, ccs_dx_prin, ccs_odx1, ccs_odx2)
     ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
