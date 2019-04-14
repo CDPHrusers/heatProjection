@@ -26,13 +26,107 @@ table(ED.agg$n)
 
 
 ##Jason's functions
+
+##define Bobb CCS codes of interest which will be filtered by later on
+##55=Fluid and electrolyte disorders 
+##157=Acute and unspecified renal failure 
+##159=Urinary tract infections 
+##244=Other injuries and conditions due to external causes
+##108=Congestive heart failure; nonhypertensive
+##2=Septicemia (except in labor)
 bobbCodes <- c(55L, 157L, 159L, 244L, 108L, 2L)
 
-filterED <- function(year) {
+##create function to read in and filter the hospital data based on Bobb codes of interest
+filterED <- function(bobbCodes, year, numDiagnosis) {
   file<- paste0("ED/cdph_ed_rln",year,".csv")
   foo <- fread(paste(file))
   
+  if (numDiagnosis=1){
+     setkey(foo, ccs_dx_prin)
+ ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+ ##bring in patient's zipcode, county code, and date of service
+  out <-
+    foo [ccs_dx_prin %in% bobbCodes , c(
+             "dx_prin",
+             "ec_prin",
+             "ccs_dx_prin",
+             "fac_id",
+             "pat_type",
+             "lic_type",
+             "agdyserv",
+             "agyrserv",
+             "sex",
+             "patzip",
+             "patco",
+           # "serv_q",
+           # "serv_d",
+           # "serv_m",
+           # "serv_y",
+             "dispn",
+             "payer",
+             "pr_prin",
+             "opr1",
+             "serv_dt",
+             "brthdate",
+           # "dob_raw",
+             "faczip",
+             "fac_co",
+             "rln",
+             "race_grp"
+           )] # %>%
+  ##count the number of cases by patient zip code and by date
+  # .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+  
+  return(out)
+    
+    } else if (numDiagnosis=2) {
+    ##set key to primary, secondary, and tertiary ccs diagnosis columns
+  setkey(foo, ccs_dx_prin, ccs_odx1)
+ ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+ ##bring in patient's zipcode, county code, and date of service
+  out <-
+    foo [ccs_dx_prin %in% bobbCodes |
+           ccs_odx1 %in% bobbCodes, c(
+             "dx_prin",
+             "ec_prin",
+             "ccs_dx_prin",
+             "ccs_odx1",
+             "fac_id",
+             "pat_type",
+             "lic_type",
+             "agdyserv",
+             "agyrserv",
+             "sex",
+             "patzip",
+             "patco",
+           # "serv_q",
+           # "serv_d",
+           # "serv_m",
+           # "serv_y",
+             "dispn",
+             "payer",
+             "pr_prin",
+             "opr1",
+             "serv_dt",
+             "brthdate",
+           # "dob_raw",
+             "faczip",
+             "fac_co",
+             "rln",
+             "race_grp"
+           )] # %>%
+  ##count the number of cases by patient zip code and by date
+  # .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+  
+  return(out)
+    
+    } else if (numDiagnosis=3) {
+ ##set key to primary, secondary, and tertiary ccs diagnosis columns
   setkey(foo, ccs_dx_prin, ccs_odx1, ccs_odx2)
+ ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+ ##bring in patient's zipcode, county code, and date of service
   out <-
     foo [ccs_dx_prin %in% bobbCodes |
            ccs_odx1 %in% bobbCodes |
@@ -59,21 +153,27 @@ filterED <- function(year) {
              "pr_prin",
              "opr1",
              "serv_dt",
-           # "brthdate",
-             "dob_raw",
+             "brthdate",
+           # "dob_raw",
              "faczip",
-           # "fac_co",
+             "fac_co",
              "rln",
              "race_grp"
-           )] %>%
-  .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+           )] # %>%
+  ##count the number of cases by patient zip code and by date
+  # .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
 
   
   return(out)
   
+  }
+  else 
+    print("The number of diagnoses did not match the function criteria")
+  
 }
 
+##create function to read in the PRISM temp data for each year of interest
 getPRISM <- function(year){
   #year<-2008
   file<- paste0("PRISM/prism_",year,".csv")
@@ -86,6 +186,7 @@ getPRISM <- function(year){
   
 }
 
+##create function that combines the hospital data and the temperature data into one datatable
 EDtempcombine <- function(year) {
 #ED <- filterED(2008) 
 #temp <- getPRISM(2008)
@@ -99,8 +200,10 @@ ED.agg<- ED.sub %>%
   summarize(n=n()) 
 ED.agg$Date<-as.Date(ED.agg$serv_dt, format = "%m/%d/%Y")
 
+
 #merge the ED data with the temp data by zipcode and date
 join<-merge(temp, ED.agg, by.x = c("Date", "ZCTA"), by.y = c("Date", "faczip"), all.x = T) %>% replace_na(list(n = 0))
+
 
 fwrite(join, paste0("processed/tempAndED/tempAndED_",year,".csv"))
 

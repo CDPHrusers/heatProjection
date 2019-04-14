@@ -1,6 +1,6 @@
 rm(list = ls())
-setwd('/mnt/projects/ohe/heatProjections/')
-setwd('/heatProjections/')
+# setwd('/mnt/projects/ohe/heatProjections/')
+# setwd('/heatProjections/')
 setwd('M:/')
 getwd()
 library(data.table)
@@ -19,25 +19,16 @@ if(packageVersion("dlnm")<"2.2.0")
 allZips <- fread("data/processed/tempAndED_allYears.csv")
 setkey(allZips, ZCTA)
 
-zipsWithCases<- allZips[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
+
+# restrict data to only zipcodes with cases -> I am second guessing this
+zipsWithCases <- allZips[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
+
 ##Only 320 out of ~2000 zip codes in CA have cases?
 
-##bring in all file
-file <-"data/dlnm_test_zips.rds"
-#zipCA <-readRDS(file)
-zipCA <- allZips[.(zipsWithCases)]
-
-
+##define data for model to run on
+zipCA <- allZips[.(zipsWithCases)] 
 
 zipCA$Date <- as.Date(zipCA$Date)
-
-##this needs to change. 
-zipCA$zipnames <- ifelse (zipCA$ZCTA == 93301, "Bakersfield",
-                         ifelse( zipCA$ZCTA == 93545, "LonePine", "Tahoe"))
-  
-
-#regEngWales <- read.csv("regEngWales.csv",row.names=1)
-#regEngWales$date <- as.Date(regEngWales$date)
 
 
 # ARRANGE THE DATA AS A LIST OF DATA SETS
@@ -55,26 +46,35 @@ cities <- data.frame(
 ord <- order(cities$cityname)
 dlist <- dlist[ord]
 cities <- cities[ord,]
+# these are indeces for the zipcodes that do not converge, as determined by running the model previously
 non.converge<-c(10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310)
 dlist.non<-dlist[non.converge]
 dlist.non.names<-names(dlist.non)
 
+# count the number of cases in each zipcode and create new datatable
 sum.n<-zipCA %>% group_by(ZCTA) %>% summarise(sum_n= sum(n))
+# create column that defines if the zipcode converged or not
 sum.n$converge<- ifelse(sum.n$ZCTA %in% dlist.non.names, "n","y")
+                
+# remove the zipcodes that did not converge
 dlist<-dlist[-c(10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310)]
+                
+# remove the zipcodes that did not converge
 cities<-cities[-c(10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310),]
+                
 # REMOVE ORIGINALS
 rm(zipCA,regions,ord)
 
 ################################################################################
-
+# The following specifications are those defined by Antonnio Gasparrini in his 2015 Lancet paper
 # SPECIFICATION OF THE EXPOSURE FUNCTION
 varfun = "bs"
 vardegree = 2
 varper <- c(10,75,90)
 
 # SPECIFICATION OF THE LAG FUNCTION
-lag <- 21
+# I changed the lag from the original 21 to 3 as suggested by Rish. I'm not sure if we now need to change the number of knots                
+lag <- 3
 lagnk <- 3
 
 # DEGREE OF FREEDOM FOR SEASONALITY-> knots per year
@@ -113,12 +113,12 @@ for(i in seq(length(dlist))) {
                  degree=vardegree)
   cb <- dlnm::crossbasis(data$tmean_mean,lag=lag,argvar=argvar,
                    arglag=list(knots=logknots(lag,lagnk)))
-  #summary(cb)
   
   # RUN THE MODEL AND OBTAIN PREDICTIONS
   # NB: NO CENTERING NEEDED HERE, AS THIS DOES NOT AFFECT COEF-VCOV
   model <- glm(formula,data,family=quasipoisson,na.action="na.exclude")
   options(warn=1)
+  
   #centered on average temperature
   cen <- mean(data$tmean_mean,na.rm=T)
   pred <- crosspred(cb,model,cen=cen, by=1)
@@ -131,9 +131,8 @@ for(i in seq(length(dlist))) {
   
 }
 proc.time()[3]-time
-##in dlist, 10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 
-##145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310 did not converge
-#
+# I ran the model originally and these were the zipcodes that did not converge -> these are the ones taken out at the beginning of script
+# in dlist: 10, 13, 22, 40, 89, 111, 121, 123, 129, 139, 145, 180, 181, 183, 189, 207, 219, 228, 243, 265, 310 did not converge
 coef[1]
 vcov[1]
 
@@ -191,7 +190,7 @@ blup <- blup(mv,vcov=T)
 minperccity <- mintempcity <- rep(NA,length(dlist))
 names(mintempcity) <- names(minperccity) <- cities$city
 
-# DEFINE MINIMUM MORTALITY VALUES: EXCLUDE LOW AND VERY HOT TEMPERATURE
+# DEFINE MINIMUM ED VISIT VALUES: EXCLUDE LOW AND VERY HOT TEMPERATURE
 for(i in seq(length(dlist))) {
   data <- dlist[[i]]
   ##generate percentiles for average temperatures
@@ -209,7 +208,7 @@ for(i in seq(length(dlist))) {
   mintempcity[i] <- quantile(data$tmean_mean,minperccity[i]/100,na.rm=T)
 }
 
-# COUNTRY-SPECIFIC POINTS OF MINIMUM MORTALITY-> the median optimal percentile
+# COUNTRY-SPECIFIC POINTS OF MINIMUM ED VISIT-> the median optimal percentile
 (minperccountry <- median(minperccity))
 
 
@@ -219,18 +218,18 @@ for(i in seq(length(dlist))) {
 # LOAD THE FUNCTION FOR COMPUTING THE ATTRIBUTABLE RISK MEASURES
 source("code/attrdl.R")
 
-# CREATE THE VECTORS TO STORE THE TOTAL MORTALITY (ACCOUNTING FOR MISSING)
+# CREATE THE VECTORS TO STORE THE TOTAL ED VISITS (ACCOUNTING FOR MISSING)
 totdeath <- rep(NA,nrow(cities))
 names(totdeath) <- cities$city
 
-# CREATE THE MATRIX TO STORE THE ATTRIBUTABLE DEATHS
+# CREATE THE MATRIX TO STORE THE ATTRIBUTABLE ED VISITS
 matsim <- matrix(NA,nrow(cities),3,dimnames=list(cities$city,
                                                  c("glob","cold","heat")))
 
 # NUMBER OF SIMULATION RUNS FOR COMPUTING EMPIRICAL CI
 nsim <- 1000
 
-# CREATE THE ARRAY TO STORE THE CI OF ATTRIBUTABLE DEATHS
+# CREATE THE ARRAY TO STORE THE CI OF ATTRIBUTABLE ED VISITS
 arraysim <- array(NA,dim=c(nrow(cities),3,nsim),dimnames=list(cities$city,
                                                               c("glob","cold","heat")))
 
@@ -252,7 +251,7 @@ for(i in seq(dlist)){
   cb <- crossbasis(data$tmean_mean,lag=lag,argvar=argvar,
                    arglag=list(knots=logknots(lag,lagnk)))
   
-  # COMPUTE THE ATTRIBUTABLE DEATHS
+  # COMPUTE THE ATTRIBUTABLE ED VISITS
   # NB: THE REDUCED COEFFICIENTS ARE USED HERE
   matsim[i,"glob"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i])
@@ -263,7 +262,7 @@ for(i in seq(dlist)){
                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i],
                              range=c(mintempcity[i],100))
   
-  # COMPUTE EMPIRICAL OCCURRENCES OF THE ATTRIBUTABLE DEATHS
+  # COMPUTE EMPIRICAL OCCURRENCES OF THE ATTRIBUTABLE ED VISITS
   # USED TO DERIVE CONFIDENCE INTERVALS
   arraysim[i,"glob",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i],sim=T,nsim=nsim)
@@ -274,7 +273,7 @@ for(i in seq(dlist)){
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempcity[i],
                                 range=c(mintempcity[i],100),sim=T,nsim=nsim)
   
-  # STORE THE DENOMINATOR OF ATTRIBUTABLE DEATHS, I.E. TOTAL OBSERVED MORTALITY
+  # STORE THE DENOMINATOR OF ATTRIBUTABLE ED VISITS, I.E. TOTAL OBSERVED ED VISITS
   # CORRECT DENOMINATOR TO COMPUTE THE ATTRIBUTABLE FRACTION LATER, AS IN attrdl
   totdeath[i] <- sum(data$n,na.rm=T)
 }
@@ -295,7 +294,7 @@ antot <- colSums(matsim) ##839842.21 ED visits attributed to heat and cold
 antotlow <- apply(apply(arraysim,c(2,3),sum),1,quantile,0.025)
 antothigh <- apply(apply(arraysim,c(2,3),sum),1,quantile,0.975)
 ################################################################################
-# TOTAL MORTALITY
+# TOTAL ED VISITS
 
 # BY COUNTRY, the total number of ED visits (empirical)
 totdeathtot <- sum(totdeath)
@@ -312,7 +311,4 @@ write.csv(afcity,"attributable_frac_zips.csv")
 aftot <- antot/totdeathtot*100
 aftotlow <- antotlow/totdeathtot*100
 aftothigh <- antothigh/totdeathtot*100
-
-#
-
 
