@@ -54,10 +54,10 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
              "fac_co",
              "rln",
              "race_grp"
-           )] %>%
+           )] # %>%
   ##count the number of cases by patient zip code and by date
-  .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+  # .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
     
@@ -96,10 +96,10 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
              "fac_co",
              "rln",
              "race_grp"
-           )] %>%
+           )] # %>%
   ##count the number of cases by patient zip code and by date
-  .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+  # .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
     
@@ -140,10 +140,10 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
              "fac_co",
              "rln",
              "race_grp"
-           )] %>%
+           )] # %>%
   ##count the number of cases by patient zip code and by date
-  .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+  # .[,n :=.n, by=.(patzip, serv_dt)]%>%
+  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
   
@@ -182,7 +182,7 @@ EDtempcombine <- function(year) {
 # ED.agg$Date<-as.Date(ED.agg$serv_dt, format = "%m/%d/%Y")
 
 #merge the ED data with the temp data by patient zipcode and date
-join<-merge(temp, ED, by.x = c("Date", "ZCTA"), by.y = c("Date", "patzip"), all.x = T) %>% replace_na(list(n = 0))
+join<-merge(temp, ED, by.x = c("Date", "ZCTA"), by.y = c("Date", "patzip"), all.x = T) # %>% replace_na(list(n = 0))
 
 fwrite(join, paste0("processed/tempAndED/tempAndED_",year,".csv"))
 
