@@ -19,7 +19,7 @@ if(packageVersion("dlnm")<"2.2.0")
 allZips <- fread("data/processed/tempAndED_allYears.csv")
 setkey(allZips, ZCTA)
 
-zipsWithCases <- allZips[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
+zipsWithCases<- allZips[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
 ##Only 320 out of ~2000 zip codes in CA have cases?
 
 ##bring in all file
