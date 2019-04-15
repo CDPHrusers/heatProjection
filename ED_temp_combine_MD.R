@@ -57,7 +57,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
            )] # %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+    .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
     
@@ -99,7 +99,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
            )] # %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+    .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
     
@@ -143,7 +143,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
            )] # %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
-  # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+    .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
   
