@@ -8,4 +8,4 @@ test_index <- sample(1:nrow(data), 0.05 * nrow(data), replace=FALSE)
 # subset data
 sub_data <- data[test_index,]
 
-fwrite(sub_data, "/data/sub_tempAndED_allYears.csv")
+fwrite(sub_data, "/processed/sub_tempAndED_allYears.csv")
