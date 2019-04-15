@@ -45,10 +45,10 @@ filterED <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), year = 2005
         "fac_co",
         "rln",
         "race_grp"
-      )] # %>%
+      )]  %>%
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
-    # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
     
     return(out)
     
@@ -87,10 +87,10 @@ filterED <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), year = 2005
                "fac_co",
                "rln",
                "race_grp"
-             )] # %>%
+             )]  %>%
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
-    # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
     
     return(out)
     
@@ -131,10 +131,10 @@ filterED <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), year = 2005
                "fac_co",
                "rln",
                "race_grp"
-             )] # %>%
+             )]  %>%
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
-    # .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
+     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
     
     return(out)
     
