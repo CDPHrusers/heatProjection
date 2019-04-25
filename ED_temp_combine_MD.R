@@ -17,17 +17,8 @@ library(parallel)
 ##2=Septicemia (except in labor)
 bobbCodes <- c(55L, 157L, 159L, 244L, 108L, 2L)
 
-##create function to read in and filter the hospital data based on Bobb codes of interest
-filterED <- function(bobbCodes, year, numDiagnosis) {
-  file<- paste0("ED/cdph_ed_rln",year,".csv")
-  foo <- fread(paste(file))
-  
-  if (numDiagnosis=1){
-     setkey(foo, ccs_dx_prin)
- ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
- ##bring in patient's zipcode, county code, and date of service
-  out <-
-    foo [ccs_dx_prin %in% bobbCodes , c(
+# create a vector of all variables you want from the ED data
+patient.vars<- c(
              "dx_prin",
              "ec_prin",
              "ccs_dx_prin",
@@ -54,7 +45,20 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
              "fac_co",
              "rln",
              "race_grp"
-           )] # %>%
+           )
+
+
+##create function to read in and filter the hospital data based on Bobb codes of interest
+filterED <- function(bobbCodes, year, patient.vars, numDiagnosis) {
+  file<- paste0("ED/cdph_ed_rln",year,".csv")
+  foo <- fread(paste(file))
+  
+  if (numDiagnosis=1){
+     setkey(foo, ccs_dx_prin)
+ ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+ ##bring in patient's zipcode, county code, and date of service
+  out <-
+    foo [ccs_dx_prin %in% bobbCodes , patient.vars] %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
@@ -68,35 +72,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
  ##bring in patient's zipcode, county code, and date of service
   out <-
     foo [ccs_dx_prin %in% bobbCodes |
-           ccs_odx1 %in% bobbCodes, c(
-             "dx_prin",
-             "ec_prin",
-             "ccs_dx_prin",
-             "ccs_odx1",
-             "fac_id",
-             "pat_type",
-             "lic_type",
-             "agdyserv",
-             "agyrserv",
-             "sex",
-             "patzip",
-             "patco",
-           # "serv_q",
-           # "serv_d",
-           # "serv_m",
-           # "serv_y",
-             "dispn",
-             "payer",
-             "pr_prin",
-             "opr1",
-             "serv_dt",
-             "brthdate",
-           # "dob_raw",
-             "faczip",
-             "fac_co",
-             "rln",
-             "race_grp"
-           )] # %>%
+           ccs_odx1 %in% bobbCodes, patient.vars]  %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
@@ -111,36 +87,7 @@ filterED <- function(bobbCodes, year, numDiagnosis) {
   out <-
     foo [ccs_dx_prin %in% bobbCodes |
            ccs_odx1 %in% bobbCodes |
-           ccs_odx2 %in% bobbCodes, c(
-             "dx_prin",
-             "ec_prin",
-             "ccs_dx_prin",
-             "ccs_odx1",
-             "ccs_odx2" ,
-             "fac_id",
-             "pat_type",
-             "lic_type",
-             "agdyserv",
-             "agyrserv",
-             "sex",
-             "patzip",
-             "patco",
-           # "serv_q",
-           # "serv_d",
-           # "serv_m",
-           # "serv_y",
-             "dispn",
-             "payer",
-             "pr_prin",
-             "opr1",
-             "serv_dt",
-             "brthdate",
-           # "dob_raw",
-             "faczip",
-             "fac_co",
-             "rln",
-             "race_grp"
-           )] # %>%
+           ccs_odx2 %in% bobbCodes, patient.vars] %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
@@ -220,4 +167,8 @@ all <- rbindlist(lapply(list.files(path = "processed/tempAndED/", full.names = T
 
 # and save
 fwrite(all, "processed/tempAndED_allYears.csv")
+
+# take a random subset of complete dataset to use as test data
+subset.df<-all[sample(nrow(all),200),]
+fwrite(subset.df, "processed/tempAndED_allYears_sample.csv")
 
