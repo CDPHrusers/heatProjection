@@ -5,6 +5,7 @@ getwd()
 library(data.table)
 library(tidyverse)
 library(parallel)
+library(heatProjectR)
 
 ##Jason's functions
 
