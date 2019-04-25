@@ -15,10 +15,10 @@ library(parallel)
 ##244=Other injuries and conditions due to external causes
 ##108=Congestive heart failure; nonhypertensive
 ##2=Septicemia (except in labor)
-bobbCodes <- c(55L, 157L, 159L, 244L, 108L, 2L)
+bobb_codes <- c(55L, 157L, 159L, 244L, 108L, 2L)
 
 # create a vector of all variables you want from the ED data
-patient.vars<- c(
+patient_vars<- c(
              "dx_prin",
              "ec_prin",
              "ccs_dx_prin",
@@ -49,45 +49,45 @@ patient.vars<- c(
 
 
 ##create function to read in and filter the hospital data based on Bobb codes of interest
-filterED <- function(bobbCodes, year, patient.vars, numDiagnosis) {
+filterED <- function(bobb_codes, year, patient_vars, num_diagnosis) {
   file<- paste0("ED/cdph_ed_rln",year,".csv")
   foo <- fread(paste(file))
   
-  if (numDiagnosis=1){
+  if (num_diagnosis=1){
      setkey(foo, ccs_dx_prin)
  ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
  ##bring in patient's zipcode, county code, and date of service
   out <-
-    foo [ccs_dx_prin %in% bobbCodes , patient.vars] %>%
+    foo [ccs_dx_prin %in% bobb_codes , patient_vars] %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
     
-    } else if (numDiagnosis=2) {
+    } else if (num_diagnosis=2) {
     ##set key to primary, secondary, and tertiary ccs diagnosis columns
   setkey(foo, ccs_dx_prin, ccs_odx1)
  ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
  ##bring in patient's zipcode, county code, and date of service
   out <-
-    foo [ccs_dx_prin %in% bobbCodes |
-           ccs_odx1 %in% bobbCodes, patient.vars]  %>%
+    foo [ccs_dx_prin %in% bobb_codes |
+           ccs_odx1 %in% bobb_codes, patient_vars]  %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
   
   return(out)
     
-    } else if (numDiagnosis=3) {
+    } else if (num_diagnosis=3) {
  ##set key to primary, secondary, and tertiary ccs diagnosis columns
   setkey(foo, ccs_dx_prin, ccs_odx1, ccs_odx2)
  ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
  ##bring in patient's zipcode, county code, and date of service
   out <-
-    foo [ccs_dx_prin %in% bobbCodes |
-           ccs_odx1 %in% bobbCodes |
-           ccs_odx2 %in% bobbCodes, patient.vars] %>%
+    foo [ccs_dx_prin %in% bobb_codes |
+           ccs_odx1 %in% bobb_codes |
+           ccs_odx2 %in% bobb_codes, patient_vars] %>%
   ##count the number of cases by patient zip code and by date
   # .[,n :=.n, by=.(patzip, serv_dt)]%>%
     .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
@@ -168,7 +168,19 @@ all <- rbindlist(lapply(list.files(path = "processed/tempAndED/", full.names = T
 # and save
 fwrite(all, "processed/tempAndED_allYears.csv")
 
-# take a random subset of complete dataset to use as test data
-subset.df<-all[sample(nrow(all),200),]
-fwrite(subset.df, "processed/tempAndED_allYears_sample.csv")
+# pull out 200 observations randomly
+sub_df<-all[sample(nrow(all),200),]
+# order subset by Date
+sub_df<-sub_df[order(Date),]
+# pull out the Zipcode and sort it 
+ZCTA<- sort(sub_df$ZCTA)
+# pull out the age at service and sort it
+agyrserv<-sort(sub_df$agyrserv)
+# remove zipcode and age at service from subsetted data
+sub_df<-subset(sub_df, -c(ZCTA, agyrserv))
+# combine the subset data ordered by date with the zip code and age also ordered - this is non-identifiable 
+sub_df<-cbind(sub_df, ZCTA, agyrserv)
+
+# save as sample data to test functions on
+fwrite(sub_df, "processed/tempAndED_allYears_sample.csv")
 
