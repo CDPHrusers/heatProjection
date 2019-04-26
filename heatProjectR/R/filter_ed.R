@@ -1,4 +1,4 @@
-#' Filter ED
+#' filter_ed
 #'
 #' This function allows you to filter a single year of OSHPD Emergency Department Visits for the Clinical Classification System Codes of interest.
 #' @param BobbCodes A collection of text CCS codes to pull out. 
@@ -7,9 +7,9 @@
 #' @keywords EDvisits
 #' @export
 #' @examples
-#' filterED()
+#' filter_ed()
 
-filterED <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path = "R:/heatProjections/data/processed/ed_test_data.csv", numDiagnosis = 3) {
+filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path = "R:/heatProjections/data/processed/ed_test_data.csv", numDiagnosis = 3) {
 
   foo <- fread(paste(file_path))
   

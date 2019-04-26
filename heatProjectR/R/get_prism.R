@@ -5,10 +5,10 @@
 #' @keywords PRISM
 #' @export
 #' @examples
-#' getPRISM()
+#' get_prism()
 
 
-getPRISM <- function(file_path = "R:/heatProjections/data/processed/prism_test_data.csv"){
+get_prism <- function(file_path = "R:/heatProjections/data/processed/prism_test_data.csv"){
    foo <- fread(paste(file_path))
   #colnames(foo)[1]<-"index"
   
