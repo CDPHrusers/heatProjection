@@ -13,7 +13,7 @@ actual_prism <- fread("PRISM/prism_2005.csv")
 random_zips <- sample(unique(actual_prism$ZCTA), 25)
 
 
-foo <- actual_ed[sample(nrow(actual),2000),]
+foo <- actual_ed[sample(nrow(actual_ed),2000),]
 # order subset by Date
 foo2<-foo[order(serv_dt),]
 # pull out the age at service and sort it
