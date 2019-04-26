@@ -15,5 +15,5 @@ setwd("..")
 install("heatProjectR")
 
 
-?getPRISM
+?get_prism
 fread("R:/heatProjections/data/processed/ed_test_data.csv")
