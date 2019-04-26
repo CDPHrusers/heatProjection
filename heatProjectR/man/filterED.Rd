@@ -4,15 +4,16 @@
 \alias{filterED}
 \title{Filter ED}
 \usage{
-filterED(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), year = 2005,
+filterED(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L),
+  file_path = "R:/heatProjections/data/processed/ed_test_data.csv",
   numDiagnosis = 3)
 }
 \arguments{
-\item{year}{Four digit year as it appears in OSPHD filnes 'cdph_ed_rlnYYYY.csv'. Defauls to 2005}
+\item{file_path}{The file path to the ED data you wish to process.  Defaults to test data on the R server at CDPH}
 
 \item{numDiagnosis}{If 1, only the primary diagnosis will be used. Values of 2 or 3 correspond to including secondary and tertiatry diagnoses. Defaults to 3.}
 
-\item{BobbCodes}{This is a collection of text CCS codes to pull out.}
+\item{BobbCodes}{A collection of text CCS codes to pull out.}
 }
 \description{
 This function allows you to filter a single year of OSHPD Emergency Department Visits for the Clinical Classification System Codes of interest.

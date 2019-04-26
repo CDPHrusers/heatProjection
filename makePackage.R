@@ -1,13 +1,11 @@
-install.packages("devtools")
+# install.packages("devtools")
 library("devtools")
 devtools::install_github("klutometis/roxygen")
 library(roxygen2)
 
-
-
 setwd("R:/heatProjections/code/heatProjection/")
 
-create("heatProjectR")
+#create("heatProjectR")
 
 setwd("./heatProjectR/")
 document()
@@ -18,3 +16,4 @@ install("heatProjectR")
 
 
 ?getPRISM
+fread("R:/heatProjections/data/processed/ed_test_data.csv")

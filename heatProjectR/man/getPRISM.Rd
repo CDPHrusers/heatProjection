@@ -4,10 +4,11 @@
 \alias{getPRISM}
 \title{Get PRISM Function}
 \usage{
-getPRISM(year)
+
+  getPRISM(file_path = "R:/heatProjections/data/processed/prism_test_data.csv")
 }
 \arguments{
-\item{year}{Four digit year as appears in the PRISM filename 'prism_YYYY.csv'.}
+\item{file_path}{The file path to the PRISM data you wish to process.  Defaults to test data on the R server at CDPH.}
 }
 \description{
 This function allows you to ingest a single year of PRISM daily data processed at the zip code scale in Google EARTH.
