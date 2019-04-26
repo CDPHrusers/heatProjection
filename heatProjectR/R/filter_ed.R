@@ -50,8 +50,6 @@ filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path 
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
      .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
     
-    return(out)
-    
   } else if (numDiagnosis==2) {
     ##set key to primary, secondary, and tertiary ccs diagnosis columns
     setkey(foo, ccs_dx_prin, ccs_odx1)
@@ -91,8 +89,6 @@ filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path 
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
      .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
-    
-    return(out)
     
   } else if (numDiagnosis==3) {
     ##set key to primary, secondary, and tertiary ccs diagnosis columns
@@ -136,10 +132,9 @@ filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path 
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
      .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
     
-    return(out)
-    
   }
   else 
     print("The number of diagnoses did not match the function criteria")
   
+  return(out)
 }
