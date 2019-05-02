@@ -29,3 +29,5 @@ new <- fread("./data/processed/tempAndED/2019-04-26_tempAndED_2005.csv")
 old <- fread("./data/processed/tempAndED/tempAndED_2005.csv")
 
 new == old
+
+all <- fread("./data/processed/tempAndED_allYears.csv")
