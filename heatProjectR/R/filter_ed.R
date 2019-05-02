@@ -9,16 +9,12 @@
 #' @examples
 #' filter_ed()
 
-filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path = "R:/heatProjections/data/processed/ed_test_data.csv", numDiagnosis = 3) {
+filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), 
+                      file_path = "R:/heatProjections/data/processed/ed_test_data.csv", 
+                      numDiagnosis = 3) {
 
-  foo <- fread(paste(file_path))
-  
-  if (numDiagnosis==1){
-    setkey(foo, ccs_dx_prin)
-    ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
-    ##bring in patient's zipcode, county code, and date of service
-    out <-
-      foo [ccs_dx_prin %in% bobbCodes , c(
+  foo <- fread(paste(file_path))[patco == 0]
+  col_list <- c(
         "dx_prin",
         "ec_prin",
         "ccs_dx_prin",
@@ -45,7 +41,13 @@ filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path 
         "fac_co",
         "rln",
         "race_grp"
-      )]  %>%
+      )
+  if (numDiagnosis==1){
+    setkey(foo, ccs_dx_prin)
+    ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+    ##bring in patient's zipcode, county code, and date of service
+    out <-
+      foo [ccs_dx_prin %in% bobbCodes , col_list]  %>%
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
      .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
@@ -57,35 +59,7 @@ filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path 
     ##bring in patient's zipcode, county code, and date of service
     out <-
       foo [ccs_dx_prin %in% bobbCodes |
-             ccs_odx1 %in% bobbCodes, c(
-               "dx_prin",
-               "ec_prin",
-               "ccs_dx_prin",
-               "ccs_odx1",
-               "fac_id",
-               "pat_type",
-               "lic_type",
-               "agdyserv",
-               "agyrserv",
-               "sex",
-               "patzip",
-               "patco",
-               # "serv_q",
-               # "serv_d",
-               # "serv_m",
-               # "serv_y",
-               "dispn",
-               "payer",
-               "pr_prin",
-               "opr1",
-               "serv_dt",
-               "brthdate",
-               # "dob_raw",
-               "faczip",
-               "fac_co",
-               "rln",
-               "race_grp"
-             )]  %>%
+             ccs_odx1 %in% bobbCodes, col_list]  %>%
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
      .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
@@ -98,43 +72,13 @@ filter_ed <- function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L), file_path 
     out <-
       foo [ccs_dx_prin %in% bobbCodes |
              ccs_odx1 %in% bobbCodes |
-             ccs_odx2 %in% bobbCodes, c(
-               "dx_prin",
-               "ec_prin",
-               "ccs_dx_prin",
-               "ccs_odx1",
-               "ccs_odx2" ,
-               "fac_id",
-               "pat_type",
-               "lic_type",
-               "agdyserv",
-               "agyrserv",
-               "sex",
-               "patzip",
-               "patco",
-               # "serv_q",
-               # "serv_d",
-               # "serv_m",
-               # "serv_y",
-               "dispn",
-               "payer",
-               "pr_prin",
-               "opr1",
-               "serv_dt",
-               "brthdate",
-               # "dob_raw",
-               "faczip",
-               "fac_co",
-               "rln",
-               "race_grp"
-             )]  %>%
+             ccs_odx2 %in% bobbCodes, col_list]  %>%
     ##count the number of cases by patient zip code and by date
     # .[,n :=.n, by=.(patzip, serv_dt)]%>%
      .[, Date:= as.Date(serv_dt, format = "%m/%d/%Y")]
     
   }
   else 
-    print("The number of diagnoses did not match the function criteria")
-  
+    echo("The number of diagnoses did not match the function criteria")
   return(out)
 }
