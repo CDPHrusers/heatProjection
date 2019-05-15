@@ -58,7 +58,7 @@ filter_ed <-
       out <-
         foo[ccs_dx_prin %in% bobbCodes , columns_to_keep, with=FALSE]  %>%
         ##count the number of cases by patient zip code and by date
-         .[,n :=.n, by=.(patzip, serv_dt)]%>%
+         .[,n :=.N, by=.(patzip, serv_dt)]%>%
         .[, Date := as.Date(serv_dt, format = "%m/%d/%Y")]
       
     } else if (numDiagnosis == 2) {
@@ -70,7 +70,7 @@ filter_ed <-
         foo[ccs_dx_prin %in% bobbCodes |
               ccs_odx1 %in% bobbCodes, columns_to_keep, with=FALSE]  %>%
         ##count the number of cases by patient zip code and by date
-         .[,n :=.n, by=.(patzip, serv_dt)]%>%
+         .[,n :=.N, by=.(patzip, serv_dt)]%>%
         .[, Date := as.Date(serv_dt, format = "%m/%d/%Y")]
       
     } else if (numDiagnosis == 3) {
@@ -83,7 +83,7 @@ filter_ed <-
               ccs_odx1 %in% bobbCodes |
               ccs_odx2 %in% bobbCodes, columns_to_keep, with=FALSE]  %>%
         ##count the number of cases by patient zip code and by date
-         .[,n :=.n, by=.(patzip, serv_dt)]%>%
+         .[,n :=.N, by=.(patzip, serv_dt)]%>%
         .[, Date := as.Date(serv_dt, format = "%m/%d/%Y")]
       
     }
