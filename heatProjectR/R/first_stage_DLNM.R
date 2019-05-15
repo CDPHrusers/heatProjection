@@ -29,14 +29,13 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
     stop("update dlnm package to version >= 2.2.0")
   
   # LOAD THE DATASET (CA zip temps and ED counts by day)
-  allZips <- fread(paste(file_path))
-  setkey(allZips, ZCTA)
+  zipCA <- fread(paste(file_path))
+  setkey(zipCA, ZCTA)
   # restrict data to only zipcodes with cases -> I am second guessing this
-  #zipsWithCases <- allZips[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
+  #zipsWithCases <-  zipCA[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
   
   ##define data for model to run on
   #zipCA <- allZips[.(zipsWithCases)] 
-  zipCA <- allZips
   zipCA$Date <- as.Date(zipCA$Date)
   
   # ARRANGE THE DATA AS A LIST OF DATA SETS
@@ -60,7 +59,7 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
   #dlist.non.names<-names(dlist.non)
  
   # count the number of cases in each zipcode and create new datatable
-  sum.n<-zipCA %>% group_by(ZCTA) %>% summarise(sum_n= sum(n))
+  #sum.n<-zipCA %>% group_by(ZCTA) %>% summarise(sum_n= sum(n))
   # create column that defines if the zipcode converged or not
   #sum.n$converge<- ifelse(sum.n$ZCTA %in% dlist.non.names, "n","y")
   
@@ -74,8 +73,8 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
   rm(zipCA,zips,ord) 
   
   # COMPUTE PERCENTILES
-  per <- t(sapply(dlist,function(x) 
-    quantile(x$tmean_mean,c(2.5,10,25,50,75,90,97.5)/100,na.rm=T)))
+  #per <- t(sapply(dlist,function(x) 
+   # quantile(x$tmean_mean,c(2.5,10,25,50,75,90,97.5)/100,na.rm=T)))
   
   # MODEL FORMULA dow=day of week, cb= crossbasis ns=function for natural spline?
   formula <- n~cb+ns(Date,df=dfseas*length(unique(year)))
