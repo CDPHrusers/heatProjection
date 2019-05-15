@@ -123,10 +123,7 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
 
   }
   proc.time()[3]-time
-    return(coef)
-    return(vcov)
-    return(zips_meta)
-    return(dlist)
+ return(list("coef" = coef, "vcov" = vcov, "zips_meta" = zips_meta, "dlist" = dlist))
 
 }
 
