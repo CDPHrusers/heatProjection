@@ -2,12 +2,14 @@ library(data.table)
 library(tidyr)
 
 setwd("R:/heatProjections/")
+# setwd("//mnt/projects/ohe/heatProjections/")
 
 # or through Rstudio in your browser 
 # setwd("//mnt/projects/ohe/heatProjections/")
 source("code/heatProjection/heatProjectR/R/filter_ed.R")
 source("code/heatProjection/heatProjectR/R/get_prism.R")
 source("code/heatProjection/heatProjectR/R/combine_ed_temp.R")
+
 
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2005.csv", file_path_prism = "data/PRISM/prism_2005.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2005.csv")
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2006.csv", file_path_prism = "data/PRISM/prism_2006.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2006.csv")
@@ -31,3 +33,4 @@ old <- fread("./data/processed/tempAndED/tempAndED_2005.csv")
 new == old
 
 all <- fread("./data/processed/tempAndED_allYears.csv")
+
