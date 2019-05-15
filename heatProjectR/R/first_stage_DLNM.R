@@ -72,8 +72,8 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
   # REMOVE ORIGINALS
   rm(zipCA,zips,ord) 
   
-  # COMPUTE PERCENTILES
-  #per <- t(sapply(dlist,function(x) 
+  # COMPUTE PERCENTILES this is needed for the plot making later on
+   # per <- t(sapply(dlist,function(x) 
    # quantile(x$tmean_mean,c(2.5,10,25,50,75,90,97.5)/100,na.rm=T)))
   
   # MODEL FORMULA dow=day of week, cb= crossbasis ns=function for natural spline?
