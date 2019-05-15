@@ -120,11 +120,11 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
     coef[i,] <- coef(red)
     vcov[[i]] <- vcov(red)
     
-    return(coef)
-    return(ccov)
+
   }
   proc.time()[3]-time
-  
+    return(coef)
+    return(vcov)
 
 }
 
