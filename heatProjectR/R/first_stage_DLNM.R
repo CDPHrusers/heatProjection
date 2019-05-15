@@ -20,7 +20,7 @@ library(splines)
 library(tsModel)
 
 
-first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_test_data.csv", varfun = "bs",
+first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv", varfun = "bs",
                               vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 3, 
                               dfseas = 8, year = 13){
   
