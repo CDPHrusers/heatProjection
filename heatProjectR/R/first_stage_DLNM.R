@@ -36,7 +36,7 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   
   ##define data for model to run on
   #zipCA <- allZips[.(zipsWithCases)] 
-  zipCA$Date <- as.Date(zipCA$Date)
+  zipCA[,Date := as.Date(Date)]
   
   # ARRANGE THE DATA AS A LIST OF DATA SETS
   zips <- as.character(unique(zipCA$ZCTA)) #used to be regions
@@ -49,7 +49,6 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
     zipname = zips
   )
   
- 
   ord <- order(zips_meta$zipname)
   dlist <- dlist[ord]
   zips_meta <- zips_meta[ord,]

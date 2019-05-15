@@ -9,8 +9,13 @@ setwd("R:/heatProjections/")
 source("code/heatProjection/heatProjectR/R/filter_ed.R")
 source("code/heatProjection/heatProjectR/R/get_prism.R")
 source("code/heatProjection/heatProjectR/R/combine_ed_temp.R")
+source("code/heatProjection/heatProjectR/R/first_stage_DLNM.R")
+source("code/heatProjection/heatProjectR/R/meta_stage_DLNM.R")
 
+# test case
+combine_ed_temp(file_path_ed = "./data/processed/ed_test_data.csv", file_path_prism = "data/processed/prism_test_data.csv", output_path = "./data/processed/combined_test_data_small.csv")
 
+# individual years
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2005.csv", file_path_prism = "data/PRISM/prism_2005.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2005.csv")
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2006.csv", file_path_prism = "data/PRISM/prism_2006.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2006.csv")
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2007.csv", file_path_prism = "data/PRISM/prism_2007.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2007.csv")
@@ -25,6 +30,8 @@ combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2015.csv", file_path_prism 
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2016.csv", file_path_prism = "data/PRISM/prism_2016.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2016.csv")
 combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2017.csv", file_path_prism = "data/PRISM/prism_2017.csv", output_path = "./data/processed/tempAndED/2019-04-26_tempAndED_2017.csv")
 
+# merge the years into a single table
+# rbindlist()
 
 # check it out the new and old 2005 files of combined temp and ed visits are identical
 new <- fread("./data/processed/tempAndED/2019-04-26_tempAndED_2005.csv")

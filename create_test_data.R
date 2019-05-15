@@ -41,6 +41,9 @@ pris <- actual_prism[ZCTA %in% random_zips]
 
 fwrite(pris, "processed/prism_test_data.csv")
 
+all<-fread("./processed/tempAndED_allYears.csv")
+all[ZCTA %in% unique(all$ZCTA)[c(3,574,392, 382)]] %>%
+  fwrite("./processed/combined_test_data.csv")
 
 
 
