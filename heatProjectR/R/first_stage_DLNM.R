@@ -44,7 +44,7 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
   dlist <- lapply(zips,function(x) zipCA[zipCA$ZCTA==x,])
   names(dlist) <- zips
   
-  # METADATA FOR LOCATIONS
+  # METADATA FOR LOCATIONS used to be "cities"
   zips_meta <- data.frame(
     zip = zips,
     zipname = zips
@@ -125,6 +125,8 @@ first_stage_DLNM <- function (file_path="R:/heatProjections/data/processed/ed_te
   proc.time()[3]-time
     return(coef)
     return(vcov)
+    return(zips_meta)
+    return(dlist)
 
 }
 
