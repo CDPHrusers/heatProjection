@@ -8,11 +8,11 @@
 #' get_prism()
 
 combine_ed_temp <- function(file_path_ed = "R:/heatProjections/data/processed/ed_test_data.csv", file_path_prism = "R:/heatProjections/data/processed/prism_test_data.csv", output_path = "data/processed/combined_test_data.csv") {
-  ED <- filter_ed(file_path = file_path_ed)[,.(n=.N, Date = as.Date(serv_dt, format = "%m/%d/%Y")), by = .(faczip, serv_dt)] 
+  ED <- filter_ed(file_path = file_path_ed)
   temp <- get_prism(file_path = file_path_prism)
   
   #merge the ED data with the temp data by zipcode and date
-  join<-merge(temp, ED, by.x = c("Date", "ZCTA"), by.y = c("Date", "faczip"), all.x = T) %>% replace_na(list(n = 0))
+  join<-merge(temp, ED, by.x = c("Date", "ZCTA"), by.y = c("Date", "patzip"), all.x = T) %>% replace_na(list(n = 0))
   
   fwrite(join, output_path)
   

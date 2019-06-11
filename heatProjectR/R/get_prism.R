@@ -8,8 +8,10 @@
 #' get_prism()
 
 
-get_prism <- function(file_path = "R:/heatProjections/data/processed/prism_test_data.csv"){
-   foo <- fread(paste(file_path))
+get_prism <- function(file_path = "//mnt/projects/ohe/heatProjections/data/processed/prism_test_data.csv"){
+   foo <- fread(paste(file_path), select = c("system:index", 
+                                             "ZCTA",
+                                             "tmean_mean"))
   #colnames(foo)[1]<-"index"
   
   foo$Date <-as.Date(substr(foo$`system:index`, start = 1,stop = 8), format = "%Y%m%d")

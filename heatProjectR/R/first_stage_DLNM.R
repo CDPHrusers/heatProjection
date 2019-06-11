@@ -93,7 +93,8 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   for(i in seq(length(dlist))) {
     # PRINT
     cat(i,"")
-    
+    i<-2
+    year<-1
     # EXTRACT THE DATA
     data <- dlist[[i]]
     

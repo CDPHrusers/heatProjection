@@ -11,18 +11,20 @@
 
 filter_ed <-
   function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L),
-           file_path = "R:/heatProjections/data/processed/ed_test_data.csv",
+           file_path = "//mnt/projects/ohe/heatProjections/data/processed/ed_test_data.csv" ,
            numDiagnosis = 3) {
 
     columns_to_keep = c(
-      "dx_prin",
-      "ec_prin",
-      "ccs_dx_prin",
-      "fac_id",
-      "pat_type",
-      "lic_type",
+      # "dx_prin",
+      # "ec_prin",
+      "ccs_dx_prin", # CCS of principal diagnosis
+      "ccs_odx1",    # CCS of first other diagnosis
+      "ccs_odx2",    # CCS of second other diagnosis
+      # "fac_id",
+      # "pat_type",
+      # "lic_type",
       "agdyserv",
-      "agyrserv",
+      "agyrserv", # time of encounter
       "sex",
       "patzip",
       "patco",
@@ -30,10 +32,10 @@ filter_ed <-
       # "serv_d",
       # "serv_m",
       # "serv_y",
-      "dispn",
-      "payer",
+      # "dispn",
+      # "payer",
       "pr_prin",
-      "opr1",
+      # "opr1",
       "serv_dt",
       "brthdate",
       # "dob_raw",
@@ -44,50 +46,37 @@ filter_ed <-
     )
     
     # read in Data table of ED for a single year
-    foo <- fread(paste(file_path))
-    setkey(foo, patzip, patco)
+    foo <- fread(paste(file_path), select = columns_to_keep,  key = c("ccs_dx_prin", "ccs_odx1", "ccs_odx2"))[patco != 0]
+    # setkey(foo, patzip, patco)
     
     # get rid of out of state and missing zip code records
-    foo <- foo[patco != 0]
-
     
     if (numDiagnosis == 1) {
-      setkey(foo, ccs_dx_prin)
       ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
       ##bring in patient's zipcode, county code, and date of service
-      out <-
-        foo[ccs_dx_prin %in% bobbCodes , columns_to_keep, with=FALSE]  %>%
-        ##count the number of cases by patient zip code and by date
-         .[,n :=.N, by=.(patzip, serv_dt)]%>%
-        .[, Date := as.Date(serv_dt, format = "%m/%d/%Y")]
-      
+      foo <- foo[ccs_dx_prin %in% bobbCodes,  .(n =.N,
+                                         Date = as.Date(serv_dt, format = "%m/%d/%Y")) , by=.(patzip, serv_dt)]
     } else if (numDiagnosis == 2) {
       ##set key to primary, secondary, and tertiary ccs diagnosis columns
-      setkey(foo, ccs_dx_prin, ccs_odx1)
       ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
       ##bring in patient's zipcode, county code, and date of service
-      out <-
+      foo <-
         foo[ccs_dx_prin %in% bobbCodes |
-              ccs_odx1 %in% bobbCodes, columns_to_keep, with=FALSE]  %>%
-        ##count the number of cases by patient zip code and by date
-         .[,n :=.N, by=.(patzip, serv_dt)]%>%
-        .[, Date := as.Date(serv_dt, format = "%m/%d/%Y")]
+              ccs_odx1 %in% bobbCodes, .(n =.N,
+                                         Date = as.Date(serv_dt, format = "%m/%d/%Y")) , by=.(patzip, serv_dt)]
       
     } else if (numDiagnosis == 3) {
-      ##set key to primary, secondary, and tertiary ccs diagnosis columns
-      setkey(foo, ccs_dx_prin, ccs_odx1, ccs_odx2)
+      ##set key to primary, secondary, and tertiary ccs diagnosis column
       ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
       ##bring in patient's zipcode, county code, and date of service
-      out <-
+      foo <-
         foo[ccs_dx_prin %in% bobbCodes |
               ccs_odx1 %in% bobbCodes |
-              ccs_odx2 %in% bobbCodes, columns_to_keep, with=FALSE]  %>%
-        ##count the number of cases by patient zip code and by date
-         .[,n :=.N, by=.(patzip, serv_dt)]%>%
-        .[, Date := as.Date(serv_dt, format = "%m/%d/%Y")]
+              ccs_odx2 %in% bobbCodes, .(n =.N,
+                                         Date = as.Date(serv_dt, format = "%m/%d/%Y")) , by=.(patzip, serv_dt)]
       
     }
     else
       echo("The number of diagnoses did not match the function criteria")
-    return(out)
+    return(foo)
   }
