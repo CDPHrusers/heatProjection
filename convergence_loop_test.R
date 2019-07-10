@@ -28,8 +28,8 @@ library(tsModel)
   varfun = "bs"
   vardegree = 2
   varper = c(10,75,90)
-  lag = 4 ##when I change the lag from 3 to 4 days, I no longer get NAs in my model coefficients
-  lagnk = 3 
+  lag = 3 ##when I change the lag from 3 to 4 days, I no longer get NAs in my model coefficients
+  lagnk = 2 #originally 3. When you change lag to 3 and lagnk to 2, everything works with vcov/coef. When lag is 3 and lagnk is 3, things break
   dfseas = 8
   year = 13
 
@@ -77,12 +77,15 @@ library(tsModel)
                          arglag=list(knots=logknots(lag,lagnk)))
   
   model <- glm(formula,data=df,family=quasipoisson,na.action="na.exclude")
+  dim(cb)
+  length(coef(model))
+  dim(vcov(model))
   
   #time <- proc.time()[3]
   for(i in seq_along(dlist)) {
     # PRINT
     cat(i,"")
-   #i<-3
+   #i<-1
     # EXTRACT THE DATA
     data2 <- dlist[[i]]
 

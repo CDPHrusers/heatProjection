@@ -21,7 +21,7 @@ library(tsModel)
 
 
 first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv", varfun = "bs",
-                              vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 3, 
+                              vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2, 
                               dfseas = 8, year = 13){
   
   # CHECK VERSION OF THE PACKAGE
@@ -78,12 +78,22 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   # MODEL FORMULA dow=day of week, cb= crossbasis ns=function for natural spline?
   formula <- n~cb+ns(Date,df=dfseas*length(unique(year)))
   
-  
+
   # COEFFICIENTS AND VCOV FOR OVERALL CUMULATIVE SUMMARY
   coef <- matrix(NA,nrow(zips_meta),length(varper)+vardegree,
                  dimnames=list(zips_meta$zip))
   vcov <- vector("list",nrow(zips_meta))
   names(vcov) <- zips_meta$zip
+  
+  mod.list <- list()
+  
+  df<-dlist[[1]]
+  argvar <- list(fun=varfun,knots=quantile(df$tmean_mean,varper/100,na.rm=T),
+                 degree=vardegree)
+  cb <- dlnm::crossbasis(df$tmean_mean,lag=lag,argvar=argvar,
+                         arglag=list(knots=logknots(lag,lagnk)))
+  
+  model <- glm(formula,data=df,family=quasipoisson,na.action="na.exclude")
   
   ################################################################################
   # RUN THE LOOP
@@ -91,34 +101,37 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   # LOOP
   time <- proc.time()[3]
   for(i in seq(length(dlist))) {
-    # PRINT
+    #i<-2
+      # PRINT
     cat(i,"")
-    i<-2
-    year<-1
+    #year<-1
     # EXTRACT THE DATA
-    data <- dlist[[i]]
+    data2 <- dlist[[i]]
     
     # DEFINE THE CROSSBASIS
-    argvar <- list(fun=varfun,knots=quantile(data$tmean_mean,varper/100,na.rm=T),
+    argvar <- list(fun=varfun,knots=quantile(data2$tmean_mean,varper/100,na.rm=T),
                    degree=vardegree)
-    cb <- dlnm::crossbasis(data$tmean_mean,lag=lag,argvar=argvar,
+    cb <- dlnm::crossbasis(data2$tmean_mean,lag=lag,argvar=argvar,
                            arglag=list(knots=logknots(lag,lagnk)))
     
-    # RUN THE MODEL AND OBTAIN PREDICTIONS
-    # NB: NO CENTERING NEEDED HERE, AS THIS DOES NOT AFFECT COEF-VCOV
-    model <- glm(formula,data,family=quasipoisson,na.action="na.exclude")
+    
+    mod2=try(update(model,data=dlist[[i]]),TRUE)
+    if(is(mod2,"warning")) print(data2$ZCTA[1]) #This doesn't actually do anything - figure out how to print zip when warning occurs
+    
+    if(isTRUE(class(mod2)=="try-error")) {next} else  {mod.list[[i]]=mod2} 
+    
     options(warn=1)
     
     #centered on average temperature
-    cen <- mean(data$tmean_mean,na.rm=T)
-    pred <- crosspred(cb,model,cen=cen, by=1)
+    cen <- mean(data2$tmean_mean,na.rm=T)
+    pred <- crosspred(cb,mod2,cen=cen, by=1)
+    
     
     # REDUCTION TO OVERALL CUMULATIVE (default)
-    red <- crossreduce(cb,model,cen=cen)
+    red <- crossreduce(cb,mod2,cen=cen)
     
     coef[i,] <- coef(red)
     vcov[[i]] <- vcov(red)
-    
 
   }
   proc.time()[3]-time

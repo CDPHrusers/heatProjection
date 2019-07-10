@@ -44,7 +44,7 @@ combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2017.csv", file_path_prism 
 gc()
 
 # merge the years into a single table 
-rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T), FUN = fread ), fill = TRUE) %>% fwrite("./data/processed/temp_and_ed_05-14.csv")
+rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T), FUN = fread ), fill = TRUE) %>% fwrite("./data/processed/temp_and_ed_05-17.csv")
 
 # make test data to run DLNM and MVMETA
 fread("./data/processed/temp_and_ed_05-14.csv")[ZCTA %in% c(90017,92102,92113,93301)] %>% fwrite("./data/processed/combined_test_data.csv")
