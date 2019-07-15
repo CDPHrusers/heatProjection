@@ -30,7 +30,10 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   
   # LOAD THE DATASET (CA zip temps and ED counts by day)
   zipCA <- fread(paste(file_path))
-  setkey(zipCA, ZCTA)
+  # Remove the rows that have missing tmeam_mean values
+  zipCA<- zipCA[!is.na(zipCA$tmean_mean)]
+ 
+   setkey(zipCA, ZCTA)
   # restrict data to only zipcodes with cases -> I am second guessing this
   #zipsWithCases <-  zipCA[, .(total = sum(n, na.rm=T)), by= "ZCTA"] %>% .[total>0, "ZCTA"]
   
@@ -101,7 +104,8 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   # LOOP
   time <- proc.time()[3]
   for(i in seq(length(dlist))) {
-    #i<-2
+    tryCatch({
+     #i<-2
       # PRINT
     cat(i,"")
     #year<-1
@@ -114,11 +118,12 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
     cb <- dlnm::crossbasis(data2$tmean_mean,lag=lag,argvar=argvar,
                            arglag=list(knots=logknots(lag,lagnk)))
     
+    print(data2$ZCTA[1])
+   
+     mod2=try(update(model,data=dlist[[i]]),TRUE)
+    #if(is(class(mod2),"warning")) print(data2$ZCTA[1]) #This doesn't actually do anything - figure out how to print zip when warning occurs
     
-    mod2=try(update(model,data=dlist[[i]]),TRUE)
-    if(is(mod2,"warning")) print(data2$ZCTA[1]) #This doesn't actually do anything - figure out how to print zip when warning occurs
-    
-    if(isTRUE(class(mod2)=="try-error")) {next} else  {mod.list[[i]]=mod2} 
+    if(isTRUE((mod2)=="try-error")) {next} else  {mod.list[[i]]=mod2} 
     
     options(warn=1)
     
@@ -133,9 +138,15 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
     coef[i,] <- coef(red)
     vcov[[i]] <- vcov(red)
 
-  }
+  }, error=function(e){cat("ERROR: ",conditionMessage(e), "\n")})
+}
   proc.time()[3]-time
- return(list("coef" = coef, "vcov" = vcov, "zips_meta" = zips_meta, "dlist" = dlist))
+  zips_to_remove <- names(which(sapply(vcov, length) == 0))
+  print(zips_to_remove)
+   return(list("coef" = coef[!is.na(coef)[,1],], 
+             "vcov" = vcov, #[-which(sapply(vcov, length) == 0)], 
+             "zips_meta" = filter(zips_meta, !zip %in% zips_to_remove), 
+             "dlist" = dlist[!names(dlist) %in% zips_to_remove]))
 
 }
 

@@ -47,6 +47,6 @@ gc()
 rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T), FUN = fread ), fill = TRUE) %>% fwrite("./data/processed/temp_and_ed_05-17.csv")
 
 # make test data to run DLNM and MVMETA
-fread("./data/processed/temp_and_ed_05-14.csv")[ZCTA %in% c(90017,92102,92113,93301)] %>% fwrite("./data/processed/combined_test_data.csv")
+fread("./data/processed/temp_and_ed_05-17.csv")[ZCTA %in% c(90017,92102,92113,93301,91046,91106,91206,90716,90670,90704,90630,90039,90032,90021,90017,90012,90003, 90010,90073, 93625, 93653, 91945, 91948, 92083, 92550, 92253, 92322, 92389, 92401, 93546, 93551, 93921)] %>% fwrite("./data/processed/combined_test_data.csv")
 
 

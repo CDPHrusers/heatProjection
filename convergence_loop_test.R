@@ -83,9 +83,10 @@ library(tsModel)
   
   #time <- proc.time()[3]
   for(i in seq_along(dlist)) {
-    # PRINT
+   tryCatch({
+     # PRINT
     cat(i,"")
-   #i<-1
+   i<-13
     # EXTRACT THE DATA
     data2 <- dlist[[i]]
 
@@ -115,11 +116,17 @@ red <- crossreduce(cb,mod2,cen=cen)
 
 coef[i,] <- coef(red)
 vcov[[i]] <- vcov(red)
+#read.csv("dummy.csv")
 
+    }, error=function(e){cat("ERROR: ",conditionMessage(e), "\n")})
   }
   
 proc.time()[3]-time
-return(list("coef" = coef, "vcov" = vcov, "zips_meta" = zips_meta, "dlist" = dlist))
+zips_to_remove <- names(which(sapply(vcov, length) == 0))
+return(list("coef" = coef[!is.na(coef)[,1],], 
+            "vcov" = vcov[-which(sapply(vcov, length) == 0)], 
+            "zips_meta" = filter(zips_meta, !zip %in% zips_to_remove), 
+            "dlist" = dlist[!names(dlist) %in% zips_to_remove]))
 
 #}
 
