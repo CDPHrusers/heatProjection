@@ -85,7 +85,8 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   # COEFFICIENTS AND VCOV FOR OVERALL CUMULATIVE SUMMARY
   coef <- matrix(NA,nrow(zips_meta),length(varper)+vardegree,
                  dimnames=list(zips_meta$zip))
-  vcov <- vector("list",nrow(zips_meta))
+ 
+   vcov <- vector("list",nrow(zips_meta))
   names(vcov) <- zips_meta$zip
   
   mod.list <- list()
@@ -97,6 +98,8 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
                          arglag=list(knots=logknots(lag,lagnk)))
   
   model <- glm(formula,data=df,family=quasipoisson,na.action="na.exclude")
+  vardf<-matrix(NA, nrow=nrow(zips_meta), ncol=3)
+
   
   ################################################################################
   # RUN THE LOOP
@@ -111,8 +114,10 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
     #year<-1
     # EXTRACT THE DATA
     data2 <- dlist[[i]]
-    
-    # DEFINE THE CROSSBASIS
+    vardf[i,1]<- var(data2$n, na.rm = FALSE)
+    vardf[i,2]<-var(data2$tmean_mean, na.rm = FALSE) 
+  vardf[i,3]<-unique(data2$ZCTA)
+     # DEFINE THE CROSSBASIS
     argvar <- list(fun=varfun,knots=quantile(data2$tmean_mean,varper/100,na.rm=T),
                    degree=vardegree)
     cb <- dlnm::crossbasis(data2$tmean_mean,lag=lag,argvar=argvar,
@@ -144,9 +149,10 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   zips_to_remove <- names(which(sapply(vcov, length) == 0))
   print(zips_to_remove)
    return(list("coef" = coef[!is.na(coef)[,1],], 
-             "vcov" = vcov, #[-which(sapply(vcov, length) == 0)], 
+             "vcov" = vcov, #[-which(sapply(vcov, length) == 0)],
              "zips_meta" = filter(zips_meta, !zip %in% zips_to_remove), 
-             "dlist" = dlist[!names(dlist) %in% zips_to_remove]))
+             "dlist" = dlist[!names(dlist) %in% zips_to_remove],
+             "variance" = vardf[!is.na(coef)[,1],]))
 
 }
 

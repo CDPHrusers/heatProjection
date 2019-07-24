@@ -81,16 +81,19 @@ library(tsModel)
   length(coef(model))
   dim(vcov(model))
   
+  vardf<-data.frame(n=numeric(), temp=numeric())
+  
   #time <- proc.time()[3]
   for(i in seq_along(dlist)) {
    tryCatch({
      # PRINT
     cat(i,"")
-   i<-13
+#   i<-13
     # EXTRACT THE DATA
     data2 <- dlist[[i]]
-
-    # DEFINE THE CROSSBASIS
+    vardf[i,1]<- var(data2$n, na.rm = FALSE)
+    vardf[i,2]<-var(data2$tmean_mean, na.rm = FALSE)    
+# DEFINE THE CROSSBASIS
     argvar <- list(fun=varfun,knots=quantile(data2$tmean_mean,varper/100,na.rm=T),
                    degree=vardegree)
     cb <- dlnm::crossbasis(data2$tmean_mean,lag=lag,argvar=argvar,
@@ -126,7 +129,8 @@ zips_to_remove <- names(which(sapply(vcov, length) == 0))
 return(list("coef" = coef[!is.na(coef)[,1],], 
             "vcov" = vcov[-which(sapply(vcov, length) == 0)], 
             "zips_meta" = filter(zips_meta, !zip %in% zips_to_remove), 
-            "dlist" = dlist[!names(dlist) %in% zips_to_remove]))
+            "dlist" = dlist[!names(dlist) %in% zips_to_remove],
+            "variance" =vardf[!is.na(coef)[,1],]))
 
 #}
 
