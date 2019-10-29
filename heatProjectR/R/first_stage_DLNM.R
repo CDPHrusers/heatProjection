@@ -46,7 +46,7 @@ first_stage_DLNM <- function (file_path="./data/processed/combined_test_data.csv
   dlist <- lapply(zips,function(x) zipCA[zipCA$ZCTA==x,])
   names(dlist) <- zips
   
-  # METADATA FOR LOCATIONS used to be "cities"
+  # METADATA FOR LOCATIONS  zips_meta used to be "cities" in gasparrini code
   zips_meta <- data.frame(
     zip = zips,
     zipname = zips

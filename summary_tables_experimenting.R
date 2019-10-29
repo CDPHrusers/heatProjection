@@ -4,7 +4,7 @@ library(lubridate)
 gc()
 # setwd("R:/heatProjections/")
 setwd("//mnt/projects/ohe/heatProjections/")
-
+getwd()
 # or through Rstudio in your browser 
 # setwd("//mnt/projects/ohe/heatProjections/")
 source("code/heatProjection/heatProjectR/R/filter_ed.R")

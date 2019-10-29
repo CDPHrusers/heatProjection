@@ -14,7 +14,7 @@ library(mvmeta)
 library(splines) 
 library(tsModel)
 
-meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_num = "/data/processed/attributable_number_zips.csv",output_path_frac = "/data/processed/attributable_frac_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
+meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_num = "/data/processed/attributable_number_zips.csv",output_path_frac = "/data/processed/attributable_frac_zips.csv", output_path_mintemp = "/data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
   
   
   dlist <- first_stage_list$dlist
@@ -39,17 +39,33 @@ meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_num = "/d
 ##SECOND STAGE##
 avgtmean <- sapply(dlist,function(x) mean(x$tmean_mean,na.rm=T))
 rangetmean <- sapply(dlist,function(x) diff(range(x$tmean_mean,na.rm=T)))
+
+ climate_zone_df<-read.csv("data/zip_climate_region_xwalk.csv")
+ climate_zone_df<-climate_zone_df[climate_zone_df$ZCTA5CE10 %in% zips_meta$zip,]
+ climate_zone_df<-climate_zone_df[match(zips_meta$zip, climate_zone_df$ZCTA5CE10),]
+ #climate_zone_10<-climate_zone_df$climate_region10
+ climate_zone_11<-climate_zone_df$climate_region11
+ 
+ climate_zone_df_16<-read.csv("data/BuildingClimateZonesByZIPCode.csv")
+ climate_zone_df_16<-climate_zone_df_16[climate_zone_df_16$zip %in% zips_meta$zip,]
+ climate_zone_df_16<-climate_zone_df_16[match(zips_meta$zip, climate_zone_df_16$zip),]
+ #climate_zone_10<-climate_zone_df$climate_region10
+ climate_zone_df_16<-climate_zone_df_16$building_CZ
 ################################################################################
 # META-ANALYSIS
 ## location-specific average temp and range included as potential effect modifiers
 print(length(avgtmean))
 print(length(rangetmean))
 print(length(vcov))
+# print(length(climate_zone_10))
+# print(length(climate_zone_11))
 print("1")
 
+#mv <- mvmeta(coef~avgtmean+rangetmean+climate_zone_11,vcov,data=zips_meta,control=list(showiter=T))
 mv <- mvmeta(coef~avgtmean+rangetmean,vcov,data=zips_meta,control=list(showiter=T))
-print("2") 
 
+print("2") 
+saveRDS(mv, "data/meta_model_just_zips_10_27.rds")
 summary(mv)
 ################################################################################
 
@@ -66,17 +82,18 @@ fwald <- function(model,var) {
 # TEST THE EFFECTS
 fwald(mv,"avgtmean")
 fwald(mv,"rangetmean")
-
+#fwald(mv,"climate_zone_11")
+print("2a")
 ################################################################################
 # OBTAIN BLUPS BLUP= best linear unbiased prediction-> city specific covariates from meta model (weighted model)
 
 blup <- blup(mv,vcov=T)
 ################################################################################
 # RE-CENTERING
-
+print("2b")
 # GENERATE THE MATRIX FOR STORING THE RESULTS
 minperczip <- mintempzip <- rep(NA,length(dlist))
-names(mintempzip) <- names(minperczip) <- zips_meta$city
+names(mintempzip) <- names(minperczip) <- zips_meta$zip ###check this
 
 # DEFINE MINIMUM ED VISIT VALUES: EXCLUDE LOW AND VERY HOT TEMPERATURE
 for(i in seq(length(dlist))) {
@@ -206,6 +223,8 @@ write.csv(afzip, output_path_frac)
 aftot <- antot/totdeathtot*100
 aftotlow <- antotlow/totdeathtot*100
 aftothigh <- antothigh/totdeathtot*100
+
+write.csv(mintempzip, output_path_mintemp)
 
 print("11")
 return(list("min_temp_zip" = mintempzip,"min_percent_zip" = minperczip,"min_percent_california" = minperccal,"attributable_number_total"= antot, "attributable_number_low"= antotlow, 

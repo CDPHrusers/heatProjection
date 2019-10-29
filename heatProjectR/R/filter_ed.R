@@ -9,6 +9,21 @@
 #' @examples
 #' filter_ed()
 
+
+# 
+# CCS codes 55  Fluid and electrolyte disorders
+#           157 Renal failure (acute/unspecified)
+#           159 Urinary tract infections
+#           244 Heat stroke and other external causes
+#           108 Congestive heart failure
+#           2   Septicemia (except in labor)
+# 
+
+
+
+
+
+
 filter_ed <-
   function(bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L),
            file_path = "//mnt/projects/ohe/heatProjections/data/processed/ed_test_data.csv" ,
