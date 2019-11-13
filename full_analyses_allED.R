@@ -4,6 +4,9 @@ gc()
 # setwd("R:/heatProjections/")
 setwd("//mnt/projects/ohe/heatProjections/")
 
+
+# install.packages("dlnm")
+
 # or through Rstudio in your browser 
 # setwd("//mnt/projects/ohe/heatProjections/")
 source("code/heatProjection/heatProjectR/R/filter_ed.R")
@@ -50,27 +53,27 @@ rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, patte
 
 
 
-full.list <-first_stage_DLNM(file_path="./data/processed/temp_and_ed_05-17.csv")
-#saveRDS(full.list, "./data/processed/first_stage_DLNM_71519.rds")
+full.list <- first_stage_DLNM(file_path="./data/processed/temp_and_ed_05-17_allED.csv")
+saveRDS(full.list, "./data/processed/first_stage_DLNM_allED.rds")
 
 full.list<-readRDS("data/processed/first_stage_DLNM_71519.rds")
 
 
 meta.full<-meta_stage_DLNM(first_stage_list =full.list, 
-                           output_path_mv_model = "data/meta_model_climate_16_11_7.rds",
-                           output_path_num = "/data/processed/attributable_number_climate_16_11_7.csv",
-                           output_path_frac = "/data/processed/attributable_frac_climate_16_11_7.csv", 
-                           output_path_mintemp = "/data/processed/mintemp_zips_climate_16_11_7.csv", 
+                           output_path_mv_model = "data/meta_model_climate_allED.rds",
+                           output_path_num = "/data/processed/attributable_number_climate_allED.csv",
+                           output_path_frac = "/data/processed/attributable_frac_climate_allED.csv", 
+                           output_path_mintemp = "/data/processed/mintemp_zips_climate_allED.csv", 
                            varfun = "bs", 
                            vardegree = 2, 
                            varper = c(10,75,90), 
                            lag = 3, 
                            lagnk = 2)
-saveRDS(meta.full, "./data/processed/meta_stage_DLNM_climate_16_11_7.rds")
+saveRDS(meta.full, "./data/processed/meta_stage_DLNM_climate_allED.rds")
 meta.full
 
 #meta<-readRDS("./data/processed/meta_stage_DLNM_72419.rds")
-#meta<-readRDS("./data/processed/meta_stage_DLNM_climate_16_11_7.rds")
+#meta<-readRDS("./data/processed/meta_stage_DLNM_climate_allED.rds")
 
 #mv.model.zips<-readRDS("data/meta_model_just_zips_10_27.rds")
 #mv.model.climate.16<-readRDS("data/meta_model_climate_16_10_29.rds")

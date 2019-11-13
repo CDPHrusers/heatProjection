@@ -7,8 +7,8 @@
 #' @examples
 #' get_prism()
 
-combine_ed_temp <- function(file_path_ed = "R:/heatProjections/data/processed/ed_test_data.csv", file_path_prism = "R:/heatProjections/data/processed/prism_test_data.csv", output_path = "data/processed/combined_test_data.csv") {
-  ED <- filter_ed(file_path = file_path_ed)
+combine_ed_temp <- function(file_path_ed = "R:/heatProjections/data/processed/ed_test_data.csv", file_path_prism = "R:/heatProjections/data/processed/prism_test_data.csv", output_path = "data/processed/combined_test_data.csv", bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L)) {
+  ED <- filter_ed(file_path = file_path_ed, bobbCodes = bobbCodes)
   temp <- get_prism(file_path = file_path_prism)
   
   #merge the ED data with the temp data by zipcode and date

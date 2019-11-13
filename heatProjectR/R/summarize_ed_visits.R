@@ -41,8 +41,26 @@ bobbCodes = c(55L, 157L, 159L, 244L, 108L, 2L)
 ED_summaries <- rbindlist(lapply(list.files("//mnt/projects/ohe/heatProjections/data/ED/", full.names = T), summarize_ed))
 fwrite(ED_summaries, "//mnt/projects/ohe/heatProjections/data/processed/ED_summaries_by_year_zip_css.csv")
 
-ED_summaries[, .(EDvisits = sum(n)), by = .(ccs_dx_prin, serv_y)]
-ED_summaries[ccs_dx_prin %in% bobbCodes, .(EDvisits = sum(n)), by = .(ccs_dx_prin, serv_y)]
+
+library(data.table)
+library(tidyverse)
+
+ED_summaries <- fread("R://heatProjections/data/processed/ED_summaries_by_year_zip_css.csv")
+
+
+ED_summaries[, .(EDvisits = sum(n)), by = .(ccs_dx_prin, serv_y)] %>% fwrite("R://heatProjections/data/processed/ED_summaries_by_year_css.csv")
+
+
+
+merge({
+  ED_summaries[ccs_dx_prin %in% bobbCodes, .(BOBB_EDvisits = sum(n)), by = .(ccs_dx_prin, serv_y)] %>%
+    dcast.data.table(formula = serv_y ~ ccs_dx_prin)
+}, {
+  ED_summaries[, .(EDvisits = sum(n)), by = .(serv_y)]
+}) %>% fwrite("R://heatProjections/data/processed/ED_visit_data_for_figure.csv")
+
+
+
 
 
 ED_summaries[, .(EDvisits = sum(n)), by = .(patzip, serv_y)]

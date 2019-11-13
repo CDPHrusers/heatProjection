@@ -66,7 +66,15 @@ filter_ed <-
     
     # get rid of out of state and missing zip code records
     
-    if (numDiagnosis == 1) {
+    if (bobbCodes %in% c("all", "All", "ALL")) {
+      ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
+      ##bring in patient's zipcode, county code, and date of service
+      foo <- foo[,  .(n = .N,
+                      Date = as.Date(serv_dt, format = "%m/%d/%Y")) , by =
+                   .(patzip, serv_dt)]
+    }
+    
+    else if (numDiagnosis == 1) {
       ##pull out all cases that have the designated Bobb codes in either the primary, secondary or tertiary diagnosis columns
       ##bring in patient's zipcode, county code, and date of service
       foo <- foo[ccs_dx_prin %in% bobbCodes,  .(n =.N,

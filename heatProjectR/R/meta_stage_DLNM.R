@@ -14,7 +14,7 @@ library(mvmeta)
 library(splines) 
 library(tsModel)
 
-meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_num = "/data/processed/attributable_number_zips.csv",output_path_frac = "/data/processed/attributable_frac_zips.csv", output_path_mintemp = "/data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
+meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "/data/processed/attributable_number_zips.csv",output_path_frac = "/data/processed/attributable_frac_zips.csv", output_path_mintemp = "/data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
   
   
   dlist <- first_stage_list$dlist
@@ -40,17 +40,15 @@ meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_num = "/d
 avgtmean <- sapply(dlist,function(x) mean(x$tmean_mean,na.rm=T))
 rangetmean <- sapply(dlist,function(x) diff(range(x$tmean_mean,na.rm=T)))
 
- climate_zone_df<-read.csv("data/zip_climate_region_xwalk.csv")
- climate_zone_df<-climate_zone_df[climate_zone_df$ZCTA5CE10 %in% zips_meta$zip,]
- climate_zone_df<-climate_zone_df[match(zips_meta$zip, climate_zone_df$ZCTA5CE10),]
- #climate_zone_10<-climate_zone_df$climate_region10
- climate_zone_11<-climate_zone_df$climate_region11
+ #climate_zone_df<-read.csv("data/zip_climate_region_xwalk.csv")
+ #climate_zone_df<-climate_zone_df[climate_zone_df$ZCTA5CE10 %in% zips_meta$zip,]
+ #climate_zone_df<-climate_zone_df[match(zips_meta$zip, climate_zone_df$ZCTA5CE10),]
+ #climate_zone_11<-climate_zone_df$climate_region11
  
  climate_zone_df_16<-read.csv("data/BuildingClimateZonesByZIPCode.csv")
  climate_zone_df_16<-climate_zone_df_16[climate_zone_df_16$zip %in% zips_meta$zip,]
  climate_zone_df_16<-climate_zone_df_16[match(zips_meta$zip, climate_zone_df_16$zip),]
- #climate_zone_10<-climate_zone_df$climate_region10
- climate_zone_df_16<-climate_zone_df_16$building_CZ
+ climate_zone_16<-climate_zone_df_16$building_CZ
 ################################################################################
 # META-ANALYSIS
 ## location-specific average temp and range included as potential effect modifiers
@@ -62,10 +60,14 @@ print(length(vcov))
 print("1")
 
 #mv <- mvmeta(coef~avgtmean+rangetmean+climate_zone_11,vcov,data=zips_meta,control=list(showiter=T))
-mv <- mvmeta(coef~avgtmean+rangetmean,vcov,data=zips_meta,control=list(showiter=T))
+mv <- mvmeta(coef~avgtmean+rangetmean+climate_zone_16,vcov,data=zips_meta,control=list(showiter=T))
+
+#mv <- mvmeta(coef~avgtmean+rangetmean,vcov,data=zips_meta,control=list(showiter=T))
 
 print("2") 
-saveRDS(mv, "data/meta_model_just_zips_10_27.rds")
+#saveRDS(mv, "data/meta_model_just_zips_10_27.rds")
+saveRDS(mv, output_path_mv_model)
+
 summary(mv)
 ################################################################################
 
@@ -126,8 +128,8 @@ print("4")
 source("code/heatProjection/attrdl.R") #fix pathway
 
 # CREATE THE VECTORS TO STORE THE TOTAL ED VISITS (ACCOUNTING FOR MISSING)
-totdeath <- rep(NA,nrow(zips_meta))
-names(totdeath) <- zips_meta$zip
+totED <- rep(NA,nrow(zips_meta))
+names(totED) <- zips_meta$zip
 
 # CREATE THE MATRIX TO STORE THE ATTRIBUTABLE ED VISITS
 matsim <- matrix(NA,nrow(zips_meta),3,dimnames=list(zips_meta$zip,
@@ -182,7 +184,7 @@ for(i in seq(dlist)){
   
   # STORE THE DENOMINATOR OF ATTRIBUTABLE ED VISITS, I.E. TOTAL OBSERVED ED VISITS
   # CORRECT DENOMINATOR TO COMPUTE THE ATTRIBUTABLE FRACTION LATER, AS IN attrdl
-  totdeath[i] <- sum(data$n,na.rm=T)
+  totED[i] <- sum(data$n,na.rm=T)
   print("8")
   }, error=function(e){cat("ERROR: ",conditionMessage(e), "\n")})
   
@@ -208,27 +210,33 @@ antothigh <- apply(apply(arraysim,c(2,3),sum),1,quantile,0.975, na.rm=TRUE)
 # TOTAL ED VISITS
 
 # BY COUNTRY, the total number of ED visits (empirical)
-totdeathtot <- sum(totdeath)
+totEDtot <- sum(totED)
 print("10")
 ################################################################################
 # ATTRIBUTABLE FRACTIONS
 
 # CITY-SPECIFIC
-afzip <- anzip/totdeath*100
-afziplow <- anziplow/totdeath*100
-afziphigh <- anziphigh/totdeath*100
+afzip <- anzip/totED*100
+afziplow <- anziplow/totED*100
+afziphigh <- anziphigh/totED*100
 write.csv(afzip, output_path_frac)
 
 # TOTAL: 6% from the zips that converged
-aftot <- antot/totdeathtot*100
-aftotlow <- antotlow/totdeathtot*100
-aftothigh <- antothigh/totdeathtot*100
+aftot <- antot/totEDtot*100
+aftotlow <- antotlow/totEDtot*100
+aftothigh <- antothigh/totEDtot*100
 
 write.csv(mintempzip, output_path_mintemp)
 
 print("11")
-return(list("min_temp_zip" = mintempzip,"min_percent_zip" = minperczip,"min_percent_california" = minperccal,"attributable_number_total"= antot, "attributable_number_low"= antotlow, 
-            "attributable_number_high" = antothigh, "total_death_total"= totdeathtot,"attributable_fraction_total"= aftot,
-            "attributable_fraction_low" = aftotlow,"attributable_fraction_high"= aftothigh))
+return(list("min_temp_zip" = mintempzip,"min_percent_zip" = minperczip,
+            "min_percent_california" = minperccal,"attributable_number_total"= antot,
+            "attributable_number_low"= antotlow, "attributable_number_high" = antothigh,
+            "total_ED_zip" = totED,"total_ED_total"= totEDtot, 
+            "attributable_number_zip" = anzip, "attributable_number_total"= antot,
+            "attributable_number_low" = antotlow,"attributable_number_high"= antothigh,
+            "attributable_fraction_zip" = afzip, "attributable_fraction_total"= aftot,
+            "attributable_fraction_low" = aftotlow,"attributable_fraction_high"= aftothigh, 
+            "dlist_meta" = dlist, "blup" = blup))
 
 }
