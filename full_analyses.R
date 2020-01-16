@@ -1,16 +1,16 @@
 library(data.table)
 library(tidyr)
 gc()
-# setwd("R:/heatProjections/")
+ setwd("R:/heatProjections/")
 setwd("//mnt/projects/ohe/heatProjections/")
 
 # or through Rstudio in your browser 
-# setwd("//mnt/projects/ohe/heatProjections/")
-source("code/heatProjection/heatProjectR/R/filter_ed.R")
-source("code/heatProjection/heatProjectR/R/get_prism.R")
-source("code/heatProjection/heatProjectR/R/combine_ed_temp.R")
-source("code/heatProjection/heatProjectR/R/first_stage_DLNM.R")
-source("code/heatProjection/heatProjectR/R/meta_stage_DLNM.R")
+ setwd("//mnt/projects/ohe/heatProjections/")
+source("/code/heatProjection/heatProjectR/R/filter_ed.R")
+source("/code/heatProjection/heatProjectR/R/get_prism.R")
+source("/code/heatProjection/heatProjectR/R/combine_ed_temp.R")
+source("/code/heatProjection/heatProjectR/R/first_stage_DLNM.R")
+source("/code/heatProjection/heatProjectR/R/meta_stage_DLNM.R")
 
 # test case
 combine_ed_temp(file_path_ed = "./data/processed/ed_test_data.csv", file_path_prism = "data/processed/prism_test_data.csv", output_path = "./data/processed/combined_test_data_small.csv")
@@ -53,20 +53,20 @@ rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, patte
 full.list <-first_stage_DLNM(file_path="./data/processed/temp_and_ed_05-17.csv")
 #saveRDS(full.list, "./data/processed/first_stage_DLNM_71519.rds")
 
-full.list<-readRDS("data/processed/first_stage_DLNM_71519.rds")
+full.list<-readRDS("/data/processed/first_stage_DLNM_71519.rds")
 
 
 meta.full<-meta_stage_DLNM(first_stage_list =full.list, 
-                           output_path_mv_model = "data/meta_model_climate_16_11_7.rds",
-                           output_path_num = "/data/processed/attributable_number_climate_16_11_7.csv",
-                           output_path_frac = "/data/processed/attributable_frac_climate_16_11_7.csv", 
-                           output_path_mintemp = "/data/processed/mintemp_zips_climate_16_11_7.csv", 
+                           output_path_mv_model = "/data/meta_model_climate_bobb_12_7_19.rds",
+                           output_path_num = "/data/processed/attributable_number_climate_bobb_12_7_19.csv",
+                           output_path_frac = "/data/processed/attributable_frac_climate_bobb_12_7_19.csv", 
+                           output_path_mintemp = "/data/processed/mintemp_zips_climate_bobb_12_7_19.csv", 
                            varfun = "bs", 
                            vardegree = 2, 
                            varper = c(10,75,90), 
                            lag = 3, 
                            lagnk = 2)
-saveRDS(meta.full, "./data/processed/meta_stage_DLNM_climate_16_11_7.rds")
+saveRDS(meta.full, "/data/processed/meta_stage_DLNM_climate_bobb_12_7_19.rds")
 meta.full
 
 #meta<-readRDS("./data/processed/meta_stage_DLNM_72419.rds")

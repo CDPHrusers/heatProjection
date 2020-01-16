@@ -1,5 +1,7 @@
 library(data.table)
 library(tidyr)
+
+rm(list=ls())
 gc()
 # setwd("R:/heatProjections/")
 setwd("//mnt/projects/ohe/heatProjections/")
@@ -54,21 +56,24 @@ rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, patte
 
 
 full.list <- first_stage_DLNM(file_path="./data/processed/temp_and_ed_05-17_allED.csv")
-saveRDS(full.list, "./data/processed/first_stage_DLNM_allED.rds")
+saveRDS(full.list, "./data/processed/first_stage_DLNM_allED.rds") # if running on rstudio server
+saveRDS(full.list, "./data/processed/first_stage_DLNM_allED_version_B.rds") # if running on your machine
 
-full.list<-readRDS("data/processed/first_stage_DLNM_71519.rds")
+
+full.list<-readRDS("data/processed/first_stage_DLNM_allED.rds") # change to match the path above in the 'saveRDS'
 
 
-meta.full<-meta_stage_DLNM(first_stage_list =full.list, 
-                           output_path_mv_model = "data/meta_model_climate_allED.rds",
-                           output_path_num = "/data/processed/attributable_number_climate_allED.csv",
-                           output_path_frac = "/data/processed/attributable_frac_climate_allED.csv", 
-                           output_path_mintemp = "/data/processed/mintemp_zips_climate_allED.csv", 
+meta.full <- meta_stage_DLNM(first_stage_list = full.list, 
+                           output_path_mv_model = "//mnt/projects/ohe/heatProjections/data/meta_model_climate_allED.rds",
+                           output_path_num = "//mnt/projects/ohe/heatProjections/data/processed/attributable_number_climate_allED.csv",
+                           output_path_frac = "//mnt/projects/ohe/heatProjections/data/processed/attributable_frac_climate_allED.csv", 
+                           output_path_mintemp = "//mnt/projects/ohe/heatProjections/data/processed/mintemp_zips_climate_allED.csv", 
                            varfun = "bs", 
                            vardegree = 2, 
                            varper = c(10,75,90), 
                            lag = 3, 
                            lagnk = 2)
+
 saveRDS(meta.full, "./data/processed/meta_stage_DLNM_climate_allED.rds")
 meta.full
 

@@ -14,12 +14,26 @@ library(mvmeta)
 library(splines) 
 library(tsModel)
 
-meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "/data/processed/attributable_number_zips.csv",output_path_frac = "/data/processed/attributable_frac_zips.csv", output_path_mintemp = "/data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
+meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "data/processed/attributable_number_zips.csv",output_path_frac = "data/processed/attributable_frac_zips.csv", output_path_mintemp = "data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
   
   
+first_stage_list = full.list
+output_path_mv_model = "//mnt/projects/ohe/heatProjections/data/meta_model_climate_UTI.rds"
+output_path_num = "//mnt/projects/ohe/heatProjections/data/processed/attributable_number_climate_UTI.csv"
+output_path_frac = "//mnt/projects/ohe/heatProjections/data/processed/attributable_frac_climate_UTI.csv" 
+output_path_mintemp = "//mnt/projects/ohe/heatProjections/data/processed/mintemp_zips_climate_UTI.csv"
+varfun = "bs"
+vardegree = 2 
+varper = c(10,75,90)
+lag = 3
+lagnk = 2
+  
+  
+
   dlist <- first_stage_list$dlist
   coef <- first_stage_list$coef
   vcov <- first_stage_list$vcov
+  vcov<-vcov[names(vcov) %in% names(dlist)]
   zips_meta <-first_stage_list$zips_meta
   varlist<- as.data.frame(first_stage_list$variance)
  colnames(varlist)<- c("n","temp","zip")
@@ -58,7 +72,7 @@ print(length(vcov))
 # print(length(climate_zone_10))
 # print(length(climate_zone_11))
 print("1")
-
+#zips_meta<-droplevels(zips_meta)
 #mv <- mvmeta(coef~avgtmean+rangetmean+climate_zone_11,vcov,data=zips_meta,control=list(showiter=T))
 mv <- mvmeta(coef~avgtmean+rangetmean+climate_zone_16,vcov,data=zips_meta,control=list(showiter=T))
 
@@ -132,17 +146,24 @@ totED <- rep(NA,nrow(zips_meta))
 names(totED) <- zips_meta$zip
 
 # CREATE THE MATRIX TO STORE THE ATTRIBUTABLE ED VISITS
-matsim <- matrix(NA,nrow(zips_meta),3,dimnames=list(zips_meta$zip,
-                                                 c("glob","cold","heat")))
-print("5")
+matsim <- matrix(NA,nrow(zips_meta),15,dimnames=list(zips_meta$zipname,
+                                                       c("glob","cold","heat","p2_5","p10", "p20","p30","p40","p50","p60","p70","p80","p90","p97_5", "p100")))
 # NUMBER OF SIMULATION RUNS FOR COMPUTING EMPIRICAL CI
 nsim <- 1000
 
 # CREATE THE ARRAY TO STORE THE CI OF ATTRIBUTABLE ED VISITS
-arraysim <- array(NA,dim=c(nrow(zips_meta),3,nsim),dimnames=list(zips_meta$zip,
-                                                              c("glob","cold","heat")))
+arraysim <- array(NA,dim=c(nrow(zips_meta),15,nsim),dimnames=list(zips_meta$zipname,
+                                                                    c("glob","cold","heat","p2_5","p10", "p20","p30","p40","p50","p60","p70","p80","p90","p97_5", "p100")))
+################################################################################
+per <- t(sapply(dlist,function(x) 
+  quantile(x$tmean,c(2.5, 10, 20, 30, 40, 50,60, 70, 80, 90, 97.5)/100,na.rm=T)))
+
+
+
 print("6")
 ################################################################################
+
+i <-3
 
 # RUN THE LOOP
 for(i in seq(dlist)){
@@ -162,25 +183,119 @@ for(i in seq(dlist)){
   
   # COMPUTE THE ATTRIBUTABLE ED VISITS
   # NB: THE REDUCED COEFFICIENTS ARE USED HERE
-  matsim[i,"glob"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
-                             vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i])
+  matsim[i,"glob"] <- attrdl(
+    x = data$tmean_mean,
+    basis = cb,
+    cases = data$n,
+    coef = blup[[i]]$blup,
+    vcov = blup[[i]]$vcov,
+    type = "an",
+    dir = "forw",
+    cen = mintempzip[i]
+  )
+  
+  
   matsim[i,"cold"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
                              range=c(-100,mintempzip[i]))
+  
+  ##get rid of negative ED visits in cold
+  matsim[i,"cold"]<- ifelse(matsim[i,"cold"] < 0, 0, matsim[i,"cold"])
+  
   matsim[i,"heat"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
                              range=c(mintempzip[i],100))
+  
+  
+  matsim[i,"p2_5"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                             vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                             range=c(-100,per[i,1])) ## bottom 2.5%ile or temperatures
+  matsim[i,"p10"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,1], per[i,2])) ## 2.5 - 10%ile or temperatures
+  matsim[i,"p20"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,2], per[i,3])) ## 10 - 20%ile  or temperatures
+  matsim[i,"p30"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,3], per[i,4])) ## 20 - 30%ile  or temperatures
+  matsim[i,"p40"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,4], per[i,5])) ## 30 - 40%ile  or temperatures
+  matsim[i,"p50"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,5], per[i,6])) ## 40 - 50%ile  or temperatures
+  matsim[i,"p60"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,6], per[i,7])) ## 50 - 60%ile  or temperatures
+  matsim[i,"p70"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,7], per[i,8])) ## 60 - 70%ile or temperatures
+  matsim[i,"p80"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,8], per[i,9])) ## 70 - 80%ile or temperatures
+  matsim[i,"p90"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                            vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                            range=c(per[i,9], per[i,10])) ## 80 - 90%ile or temperatures
+  matsim[i,"p97_5"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                              vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                              range=c(per[i,10], per[i,11])) ## 90 - 97.5%ile or temperatures
+  matsim[i,"p100"] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                             vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                             range=c(per[i,11],100)) ## top 2.5%ile ot temperatures
   
   # COMPUTE EMPIRICAL OCCURRENCES OF THE ATTRIBUTABLE ED VISITS
   # USED TO DERIVE CONFIDENCE INTERVALS
   arraysim[i,"glob",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],sim=T,nsim=nsim)
+  
   arraysim[i,"cold",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
                                 range=c(-100,mintempzip[i]),sim=T,nsim=nsim)
+  ##get rid of negative ED visits in cold
+  arraysim[i,"cold",]<- ifelse(arraysim[i,"cold",] < 0, 0, arraysim[i,"cold",])
+  
   arraysim[i,"heat",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
                                 range=c(mintempzip[i],100),sim=T,nsim=nsim)
+  
+  arraysim[i,"p2_5",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                                vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                                range=c(-100,per[i,1]),sim=T,nsim=nsim) ## bottom 2.5%ile or temperatures
+  arraysim[i,"p10",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,1], per[i,2]),sim=T,nsim=nsim) ## 2.5 - 10%ile or temperatures
+  arraysim[i,"p20",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,2], per[i,3]),sim=T,nsim=nsim) ## 10 - 20%ile  or temperatures
+  arraysim[i,"p30",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,3], per[i,4]),sim=T,nsim=nsim) ## 20 - 30%ile  or temperatures
+  arraysim[i,"p40",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,4], per[i,5]),sim=T,nsim=nsim) ## 30 - 40%ile  or temperatures
+  arraysim[i,"p50",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,5], per[i,6]),sim=T,nsim=nsim) ## 40 - 50%ile  or temperatures
+  arraysim[i,"p60",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,6], per[i,7]),sim=T,nsim=nsim) ## 50 - 60%ile  or temperatures
+  arraysim[i,"p70",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,7], per[i,8]),sim=T,nsim=nsim) ## 60 - 70%ile or temperatures
+  arraysim[i,"p80",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,8], per[i,9]),sim=T,nsim=nsim) ## 70 - 80%ile or temperatures
+  arraysim[i,"p90",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                               vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                               range=c(per[i,9], per[i,10]),sim=T,nsim=nsim) ## 80 - 90%ile or temperatures
+  arraysim[i,"p97_5",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                                 vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                                 range=c(per[i,10], per[i,11]),sim=T,nsim=nsim) ## 90 - 97.5%ile or temperatures
+  arraysim[i,"p100",] <- attrdl(data$tmean_mean,cb,data$n,coef=blup[[i]]$blup,
+                                vcov=blup[[i]]$vcov,type="an",dir="forw",cen=mintempzip[i],
+                                range=c(per[i,11],100),sim=T,nsim=nsim) ## top 2.5%ile ot temperatures
+  
   
   # STORE THE DENOMINATOR OF ATTRIBUTABLE ED VISITS, I.E. TOTAL OBSERVED ED VISITS
   # CORRECT DENOMINATOR TO COMPUTE THE ATTRIBUTABLE FRACTION LATER, AS IN attrdl
@@ -233,8 +348,7 @@ return(list("min_temp_zip" = mintempzip,"min_percent_zip" = minperczip,
             "min_percent_california" = minperccal,"attributable_number_total"= antot,
             "attributable_number_low"= antotlow, "attributable_number_high" = antothigh,
             "total_ED_zip" = totED,"total_ED_total"= totEDtot, 
-            "attributable_number_zip" = anzip, "attributable_number_total"= antot,
-            "attributable_number_low" = antotlow,"attributable_number_high"= antothigh,
+            "attributable_number_zip" = anzip, 
             "attributable_fraction_zip" = afzip, "attributable_fraction_total"= aftot,
             "attributable_fraction_low" = aftotlow,"attributable_fraction_high"= aftothigh, 
             "dlist_meta" = dlist, "blup" = blup))
