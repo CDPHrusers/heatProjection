@@ -28,8 +28,6 @@ varper = c(10,75,90)
 lag = 3
 lagnk = 2
   
-  
-
   dlist <- first_stage_list$dlist
   coef <- first_stage_list$coef
   vcov <- first_stage_list$vcov
@@ -96,9 +94,10 @@ fwald <- function(model,var) {
 }
 
 # TEST THE EFFECTS
-fwald(mv,"avgtmean")
-fwald(mv,"rangetmean")
-#fwald(mv,"climate_zone_11")
+print(paste0("This the Wald test for avg Temp:",fwald(mv,"avgtmean")))
+print(paste0("This the Wald test for avg Temp:",fwald(mv,"rangetmean")))
+print(paste0("This the Wald test for avg Temp:",fwald(mv,"climate_zone_16")))
+
 print("2a")
 ################################################################################
 # OBTAIN BLUPS BLUP= best linear unbiased prediction-> city specific covariates from meta model (weighted model)
