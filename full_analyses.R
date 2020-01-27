@@ -84,11 +84,11 @@ rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, patte
 
 full.list <- first_stage_DLNM(file_path= paste0("./data/processed/temp_and_ed_05-17",condition,".csv"))
 saveRDS(full.list, paste0("./data/processed/first_stage_DLNM",condition,".rds")) # if running on rstudio server
-# saveRDS(full.list, "./data/processed/first_stage_DLNM_mental_version_B.rds") # if running on your machine
+# saveRDS(full.list, paste0("./data/processed/first_stage_DLNM",condition,"_version_B.rds")) # if running on your machine
 
 
 full.list<-readRDS(paste0("data/processed/first_stage_DLNM",condition,".rds")) # change to match the path above in the 'saveRDS'
-# full.list<-readRDS("data/processed/first_stage_DLNM",condition,"_version_B.rds") # change to match the path above in the 'saveRDS'
+# full.list<-readRDS(paste0("data/processed/first_stage_DLNM",condition,"_version_B.rds")) # change to match the path above in the 'saveRDS'
 
 
 meta.full <- meta_stage_DLNM(first_stage_list = full.list, 
