@@ -39,75 +39,78 @@ bobb_renal <- c(157L)
 
 ############################################################
 ############################################################
-###########   from here forward                 ############
+###########   from here forward                       ######
 ###########  replace the '_cause' portions of code    ######
 ###########  to run for another cause                 ######
 ############################################################
 ############################################################
 
-# individual years
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2005.csv", file_path_prism = "data/PRISM/prism_2005.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2005_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2006.csv", file_path_prism = "data/PRISM/prism_2006.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2006_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2007.csv", file_path_prism = "data/PRISM/prism_2007.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2007_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2008.csv", file_path_prism = "data/PRISM/prism_2008.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2008_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2009.csv", file_path_prism = "data/PRISM/prism_2009.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2009_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2010.csv", file_path_prism = "data/PRISM/prism_2010.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2010_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2011.csv", file_path_prism = "data/PRISM/prism_2011.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2011_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2012.csv", file_path_prism = "data/PRISM/prism_2012.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2012_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2013.csv", file_path_prism = "data/PRISM/prism_2013.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2013_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2014.csv", file_path_prism = "data/PRISM/prism_2014.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2014_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2015.csv", file_path_prism = "data/PRISM/prism_2015.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2015_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2016.csv", file_path_prism = "data/PRISM/prism_2016.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2016_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2017.csv", file_path_prism = "data/PRISM/prism_2017.csv", output_path = "./data/processed/tempAndED/2019-11-25_tempAndED_2017_6CCSheat.csv", bobbCodes = bobb_6CCSheat)
-gc()
+condition <- "_6CCSheat"
 
+
+# individual years
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2005.csv", file_path_prism = "data/PRISM/prism_2005.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2005",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2006.csv", file_path_prism = "data/PRISM/prism_2006.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2006",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2007.csv", file_path_prism = "data/PRISM/prism_2007.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2007",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2008.csv", file_path_prism = "data/PRISM/prism_2008.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2008",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2009.csv", file_path_prism = "data/PRISM/prism_2009.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2009",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2010.csv", file_path_prism = "data/PRISM/prism_2010.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2010",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2011.csv", file_path_prism = "data/PRISM/prism_2011.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2011",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2012.csv", file_path_prism = "data/PRISM/prism_2012.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2012",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2013.csv", file_path_prism = "data/PRISM/prism_2013.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2013",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2014.csv", file_path_prism = "data/PRISM/prism_2014.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2014",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2015.csv", file_path_prism = "data/PRISM/prism_2015.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2015",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2016.csv", file_path_prism = "data/PRISM/prism_2016.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2016",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2017.csv", file_path_prism = "data/PRISM/prism_2017.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2017",condition,".csv"), bobbCodes = bobb_6CCSheat)
+gc()
 
 
 # merge the years into a single table and save it as csv
-rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, pattern = "_renal.csv"), FUN = fread ), fill = TRUE) %>% fwrite("./data/processed/temp_and_ed_05-17_6CCSheat.csv")
+rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, pattern = "_mental.csv"), FUN = fread ), fill = TRUE) %>% fwrite(paste0("./data/processed/temp_and_ed_05-17",condition,".csv"))
 
 
 
-full.list <- first_stage_DLNM(file_path="./data/processed/temp_and_ed_05-17_6CCSheat.csv")
-saveRDS(full.list, "./data/processed/first_stage_DLNM_6CCSheat.rds") # if running on rstudio server
-# saveRDS(full.list, "./data/processed/first_stage_DLNM_6CCSheat_version_B.rds") # if running on your machine
+full.list <- first_stage_DLNM(file_path= paste0("./data/processed/temp_and_ed_05-17",condition,".csv"))
+saveRDS(full.list, paste0("./data/processed/first_stage_DLNM",condition,".rds")) # if running on rstudio server
+# saveRDS(full.list, "./data/processed/first_stage_DLNM_mental_version_B.rds") # if running on your machine
 
 
-full.list<-readRDS("data/processed/first_stage_DLNM_6CCSheat.rds") # change to match the path above in the 'saveRDS'
-# full.list<-readRDS("data/processed/first_stage_DLNM_6CCSheat_version_B.rds") # change to match the path above in the 'saveRDS'
+full.list<-readRDS(paste0("data/processed/first_stage_DLNM",condition,".rds")) # change to match the path above in the 'saveRDS'
+# full.list<-readRDS("data/processed/first_stage_DLNM",condition,"_version_B.rds") # change to match the path above in the 'saveRDS'
 
 
 meta.full <- meta_stage_DLNM(first_stage_list = full.list, 
-                           output_path_mv_model = "//mnt/projects/ohe/heatProjections/data/meta_model_6CCSheat.rds",
-                           output_path_num = "//mnt/projects/ohe/heatProjections/data/processed/attributable_number_6CCSheat.csv",
-                           output_path_frac = "//mnt/projects/ohe/heatProjections/data/processed/attributable_frac_6CCSheat.csv", 
-                           output_path_mintemp = "//mnt/projects/ohe/heatProjections/data/processed/mintemp_zips_6CCSheat.csv", 
+                           output_path_mv_model = paste0("//mnt/projects/ohe/heatProjections/data/meta_model",condition,".rds"),
+                           output_path_num = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/attributable_number",condition,".csv"),
+                           output_path_frac = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/attributable_frac",condition,".csv"), 
+                           output_path_mintemp = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/mintemp_zips",condition,".csv"), 
                            varfun = "bs", 
                            vardegree = 2, 
                            varper = c(10,75,90), 
                            lag = 3, 
                            lagnk = 2)
 
-saveRDS(meta.full, "./data/processed/meta_stage_DLNM_6CCSheat.rds")
-meta.full
+saveRDS(meta.full, paste0("./data/processed/meta_stage_DLNM",condition,".rds"))
 
-#meta<-readRDS("./data/processed/meta_stage_DLNM_72419.rds")
-#meta<-readRDS("./data/processed/meta_stage_DLNM_6CCSheat.rds")
+meta.full <- readRDS("./data/processed/meta_stage_DLNM_6CCSheat.rds")
 
-#mv.model.zips<-readRDS("data/meta_model_just_zips_10_27.rds")
-#mv.model.climate.16<-readRDS("data/meta_model_16_10_29.rds")
+source("code/heatProjection/heatProjectR/R/get_rr.R")
+
+rbindlist(lapply(names(meta.full$dlist_meta), get_rr)) %>% fwrite(paste0("./data/processed/results/temp_RR_table",condition,".csv"))
+
+
 
 
 

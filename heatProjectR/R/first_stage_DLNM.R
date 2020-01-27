@@ -12,7 +12,7 @@
 #' @param year Defines the number of years you are modeling.
 
 library(data.table)
-library(tidyverse)
+library(tidyr)
 library(parallel)
 library(dlnm) 
 library(mvmeta)

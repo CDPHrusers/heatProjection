@@ -7,7 +7,8 @@
 #' @param output_path_frac
 
 library(data.table)
-library(tidyverse)
+library(tidyr)
+library(dplyr)
 library(parallel)
 library(dlnm) 
 library(mvmeta)
@@ -17,16 +18,16 @@ library(tsModel)
 meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "data/processed/attributable_number_zips.csv",output_path_frac = "data/processed/attributable_frac_zips.csv", output_path_mintemp = "data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
   
   
-first_stage_list = full.list
-output_path_mv_model = "//mnt/projects/ohe/heatProjections/data/meta_model_climate_UTI.rds"
-output_path_num = "//mnt/projects/ohe/heatProjections/data/processed/attributable_number_climate_UTI.csv"
-output_path_frac = "//mnt/projects/ohe/heatProjections/data/processed/attributable_frac_climate_UTI.csv" 
-output_path_mintemp = "//mnt/projects/ohe/heatProjections/data/processed/mintemp_zips_climate_UTI.csv"
-varfun = "bs"
-vardegree = 2 
-varper = c(10,75,90)
-lag = 3
-lagnk = 2
+# first_stage_list = full.list
+# output_path_mv_model = "//mnt/projects/ohe/heatProjections/data/meta_model_climate_UTI.rds"
+# output_path_num = "//mnt/projects/ohe/heatProjections/data/processed/attributable_number_climate_UTI.csv"
+# output_path_frac = "//mnt/projects/ohe/heatProjections/data/processed/attributable_frac_climate_UTI.csv" 
+# output_path_mintemp = "//mnt/projects/ohe/heatProjections/data/processed/mintemp_zips_climate_UTI.csv"
+# varfun = "bs"
+# vardegree = 2 
+# varper = c(10,75,90)
+# lag = 3
+# lagnk = 2
   
   dlist <- first_stage_list$dlist
   coef <- first_stage_list$coef
@@ -41,7 +42,7 @@ lagnk = 2
   dlist<-dlist[!names(dlist) %in% zips_to_remove]
   coef<-coef[!rownames(coef) %in% zips_to_remove,]
   vcov<-vcov[!names(vcov) %in% zips_to_remove]
-  zips_meta<-filter(zips_meta, !zip %in% zips_to_remove)
+  zips_meta<-dplyr::filter(zips_meta, !zip %in% zips_to_remove)
   
   
   # CHECK VERSION OF THE PACKAGE
@@ -309,10 +310,14 @@ print("9")
 
 # CITY-SPECIFIC
 anzip <- matsim
+anzip$metric <- "estimate_AN"
 anziplow <- apply(arraysim,c(1,2),quantile,0.025, na.rm=TRUE)
+anziplow$metric <- "LL95_AN"
 anziphigh <- apply(arraysim,c(1,2),quantile,0.975, na.rm=TRUE)
+anziphigh$metric <- "UL95_AN"
 rownames(anzip) <- rownames(anziplow) <- rownames(anziphigh) <- zips_meta$zipname
-write.csv(anzip, output_path_num)
+write.csv(rbind(anzip, anziplow, anziphigh), output_path_num)
+
 
 # TOTAL
 # NB: FIRST SUM THROUGH CITIES
