@@ -15,16 +15,18 @@ library(mvmeta)
 library(splines) 
 library(tsModel)
 
-meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "data/processed/attributable_number_zips.csv",output_path_frac = "data/processed/attributable_frac_zips.csv", output_path_mintemp = "data/processed/mintemp_zips.csv", varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
+meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "data/processed/attributable_number_zips.csv", output_path_mintemp = "data/processed/mintemp_zips.csv",output_path_relrisk = "data/processed/RR_zips.csv",  varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
   
   
-# first_stage_list = full.list
-# output_path_mv_model = "//mnt/projects/ohe/heatProjections/data/meta_model_climate_UTI.rds"
-# output_path_num = "//mnt/projects/ohe/heatProjections/data/processed/attributable_number_climate_UTI.csv"
-# output_path_frac = "//mnt/projects/ohe/heatProjections/data/processed/attributable_frac_climate_UTI.csv" 
-# output_path_mintemp = "//mnt/projects/ohe/heatProjections/data/processed/mintemp_zips_climate_UTI.csv"
+# condition <- "_6CCSheat"
+# first_stage_list = readRDS(paste0("data/processed/first_stage_DLNM",condition,".rds"))
+# output_path_mv_model = paste0("//mnt/projects/ohe/heatProjections/data/meta_model",condition,".rds")
+# output_path_num = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/attributable_number",condition,".csv")
+# output_path_frac = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/attributable_frac",condition,".csv")
+# output_path_mintemp = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/mintemp_zips",condition,".csv")
+# output_path_relrisk = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/temp_RR_table",condition,".csv")
 # varfun = "bs"
-# vardegree = 2 
+# vardegree = 2
 # varper = c(10,75,90)
 # lag = 3
 # lagnk = 2
@@ -163,7 +165,7 @@ per <- t(sapply(dlist,function(x)
 print("6")
 ################################################################################
 
-i <-3
+# i <-3
 
 # RUN THE LOOP
 for(i in seq(dlist)){
@@ -309,13 +311,30 @@ print("9")
 # ATTRIBUTABLE NUMBERS
 
 # CITY-SPECIFIC
-anzip <- matsim
-anzip$metric <- "estimate_AN"
-anziplow <- apply(arraysim,c(1,2),quantile,0.025, na.rm=TRUE)
-anziplow$metric <- "LL95_AN"
-anziphigh <- apply(arraysim,c(1,2),quantile,0.975, na.rm=TRUE)
-anziphigh$metric <- "UL95_AN"
-rownames(anzip) <- rownames(anziplow) <- rownames(anziphigh) <- zips_meta$zipname
+anzip <- data.table(matsim)
+anzip <- anzip[, `:=` (
+  metric = "estimate_AN",
+  zip = names(dlist),
+  total_ED = totED
+)]
+
+
+anziplow <- apply(arraysim,c(1,2),quantile,0.025, na.rm=TRUE) %>% data.table()
+anziplow <- anziplow[, `:=` (
+  metric = "LL95_AN",
+  zip = names(dlist),
+  total_ED = totED
+)]
+
+
+
+anziphigh <- apply(arraysim,c(1,2),quantile,0.975, na.rm=TRUE) %>% data.table()
+anziphigh <- anziphigh[, `:=` (
+  metric = "UL95_AN",
+  zip = names(dlist),
+  total_ED = totED
+)]
+
 write.csv(rbind(anzip, anziplow, anziphigh), output_path_num)
 
 
@@ -334,11 +353,7 @@ print("10")
 ################################################################################
 # ATTRIBUTABLE FRACTIONS
 
-# CITY-SPECIFIC
-afzip <- anzip/totED*100
-afziplow <- anziplow/totED*100
-afziphigh <- anziphigh/totED*100
-write.csv(afzip, output_path_frac)
+
 
 # TOTAL: 6% from the zips that converged
 aftot <- antot/totEDtot*100
@@ -346,6 +361,8 @@ aftotlow <- antotlow/totEDtot*100
 aftothigh <- antothigh/totEDtot*100
 
 write.csv(mintempzip, output_path_mintemp)
+
+
 
 print("11")
 return(list("min_temp_zip" = mintempzip,"min_percent_zip" = minperczip,
@@ -356,5 +373,5 @@ return(list("min_temp_zip" = mintempzip,"min_percent_zip" = minperczip,
             "attributable_fraction_zip" = afzip, "attributable_fraction_total"= aftot,
             "attributable_fraction_low" = aftotlow,"attributable_fraction_high"= aftothigh, 
             "dlist_meta" = dlist, "blup" = blup))
-
 }
+
