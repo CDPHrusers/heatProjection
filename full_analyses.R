@@ -45,43 +45,44 @@ bobb_renal <- c(157L)
 ############################################################
 ############################################################
 
-condition <- "_6CCSheat"
+condition <- "_mental"
 
 
 
 #############combine temp and ed  #########################
 
 # individual years
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2005.csv", file_path_prism = "data/PRISM/prism_2005.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2005",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2005.csv", file_path_prism = "data/PRISM/prism_2005.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2005",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2006.csv", file_path_prism = "data/PRISM/prism_2006.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2006",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2006.csv", file_path_prism = "data/PRISM/prism_2006.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2006",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2007.csv", file_path_prism = "data/PRISM/prism_2007.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2007",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2007.csv", file_path_prism = "data/PRISM/prism_2007.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2007",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2008.csv", file_path_prism = "data/PRISM/prism_2008.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2008",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2008.csv", file_path_prism = "data/PRISM/prism_2008.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2008",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2009.csv", file_path_prism = "data/PRISM/prism_2009.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2009",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2009.csv", file_path_prism = "data/PRISM/prism_2009.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2009",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2010.csv", file_path_prism = "data/PRISM/prism_2010.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2010",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2010.csv", file_path_prism = "data/PRISM/prism_2010.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2010",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2011.csv", file_path_prism = "data/PRISM/prism_2011.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2011",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2011.csv", file_path_prism = "data/PRISM/prism_2011.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2011",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2012.csv", file_path_prism = "data/PRISM/prism_2012.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2012",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2012.csv", file_path_prism = "data/PRISM/prism_2012.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2012",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2013.csv", file_path_prism = "data/PRISM/prism_2013.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2013",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2013.csv", file_path_prism = "data/PRISM/prism_2013.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2013",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2014.csv", file_path_prism = "data/PRISM/prism_2014.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2014",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2014.csv", file_path_prism = "data/PRISM/prism_2014.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2014",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2015.csv", file_path_prism = "data/PRISM/prism_2015.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2015",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2015.csv", file_path_prism = "data/PRISM/prism_2015.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2015",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2016.csv", file_path_prism = "data/PRISM/prism_2016.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2016",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2016.csv", file_path_prism = "data/PRISM/prism_2016.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2016",condition,".csv"), bobbCodes = bobb_mental)
 gc()
-combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2017.csv", file_path_prism = "data/PRISM/prism_2017.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2017",condition,".csv"), bobbCodes = bobb_6CCSheat)
+combine_ed_temp(file_path_ed = "./data/ED/cdph_ed_rln2017.csv", file_path_prism = "data/PRISM/prism_2017.csv", output_path = paste0("./data/processed/tempAndED/tempAndED_2017",condition,".csv"), bobbCodes = bobb_mental)
 gc()
 
 
 # merge the years into a single table and save it as csv
-rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, pattern = paste0(condition,".csv")), FUN = fread ), fill = TRUE) %>% fwrite(paste0("./data/processed/temp_and_ed_05-17",condition,".csv"))
+rbindlist(lapply(list.files("./data/processed/tempAndED/", full.names = T, pattern = paste0(condition,".csv")), FUN = fread ), fill = TRUE) %>% 
+  fwrite(paste0("./data/processed/temp_and_ed_05-17",condition,".csv"))
 
 ######## RUN DLNM ############################
 
@@ -101,6 +102,7 @@ meta.full <- meta_stage_DLNM(first_stage_list = full.list,
                            output_path_mv_model = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/meta_model",condition,".rds"),
                            output_path_num = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/attributable_number",condition,".csv"),
                            output_path_mintemp = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/mintemp_zips",condition,".csv"), 
+                           output_path_frac = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/attributable_frac",condition,".csv"), 
                            output_path_relrisk = paste0("//mnt/projects/ohe/heatProjections/data/processed/results/temp_RR_table",condition,".csv"), 
                            varfun = "bs", 
                            vardegree = 2, 
@@ -108,13 +110,13 @@ meta.full <- meta_stage_DLNM(first_stage_list = full.list,
                            lag = 3, 
                            lagnk = 2)
 
-saveRDS(meta.full, paste0("./data/processed/meta_stage_DLNM",condition,".rds"))
+saveRDS(meta.full, paste0("./data/processed/results/meta_stage_DLNM",condition,".rds"))
 
 
 ############  Process results Grab RRs  ##############
 
 
-meta.full <- readRDS(paste0("./data/processed/meta_stage_DLNM",condition,".rds"))
+meta.full <- readRDS(paste0("./data/processed/results/meta_stage_DLNM",condition,".rds"))
 
 source("code/heatProjection/heatProjectR/R/get_rr.R")
 

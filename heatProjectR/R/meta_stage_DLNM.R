@@ -15,9 +15,9 @@ library(mvmeta)
 library(splines) 
 library(tsModel)
 
-meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "data/processed/attributable_number_zips.csv", output_path_mintemp = "data/processed/mintemp_zips.csv",output_path_relrisk = "data/processed/RR_zips.csv",  varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
+meta_stage_DLNM<-function(first_stage_list = first_stage,  output_path_mv_model = "data/meta_model_climate_16_11_7.rds", output_path_num = "data/processed/attributable_number_zips.csv", output_path_frac = "data/processed/attributable_frac_zips.csv", output_path_mintemp = "data/processed/mintemp_zips.csv",output_path_relrisk = "data/processed/RR_zips.csv",  varfun = "bs", vardegree = 2, varper = c(10,75,90), lag = 3, lagnk = 2){
   
-  
+ 
 # condition <- "_6CCSheat"
 # first_stage_list = readRDS(paste0("data/processed/first_stage_DLNM",condition,".rds"))
 # output_path_mv_model = paste0("//mnt/projects/ohe/heatProjections/data/meta_model",condition,".rds")
@@ -311,16 +311,23 @@ print("9")
 # ATTRIBUTABLE NUMBERS
 
 # CITY-SPECIFIC
-anzip <- data.table(matsim)
-anzip <- anzip[, `:=` (
+
+anzip <- matsim
+anziplow <- apply(arraysim,c(1,2),quantile,0.025, na.rm=TRUE)
+anziphigh <- apply(arraysim,c(1,2),quantile,0.975, na.rm=TRUE)
+rownames(anzip) <- rownames(anziplow) <- rownames(anziphigh) <- names(dlist)
+
+
+jvanzip <- data.table(matsim)
+jvanzip <- jvanzip[, `:=` (
   metric = "estimate_AN",
   zip = names(dlist),
   total_ED = totED
 )]
 
 
-anziplow <- apply(arraysim,c(1,2),quantile,0.025, na.rm=TRUE) %>% data.table()
-anziplow <- anziplow[, `:=` (
+jvanziplow <- apply(arraysim,c(1,2),quantile,0.025, na.rm=TRUE) %>% data.table()
+jvanziplow <- jvanziplow[, `:=` (
   metric = "LL95_AN",
   zip = names(dlist),
   total_ED = totED
@@ -328,14 +335,14 @@ anziplow <- anziplow[, `:=` (
 
 
 
-anziphigh <- apply(arraysim,c(1,2),quantile,0.975, na.rm=TRUE) %>% data.table()
-anziphigh <- anziphigh[, `:=` (
+jvanziphigh <- apply(arraysim,c(1,2),quantile,0.975, na.rm=TRUE) %>% data.table()
+jvanziphigh <- jvanziphigh[, `:=` (
   metric = "UL95_AN",
   zip = names(dlist),
   total_ED = totED
 )]
 
-write.csv(rbind(anzip, anziplow, anziphigh), output_path_num)
+write.csv(rbind(jvanzip, jvanziplow, jvanziphigh), output_path_num)
 
 
 # TOTAL
@@ -352,7 +359,10 @@ totEDtot <- sum(totED)
 print("10")
 ################################################################################
 # ATTRIBUTABLE FRACTIONS
-
+afzip <- anzip/totED*100
+afziplow <- anziplow/totED*100
+afziphigh <- anziphigh/totED*100
+write.csv(afzip, output_path_frac)
 
 
 # TOTAL: 6% from the zips that converged
